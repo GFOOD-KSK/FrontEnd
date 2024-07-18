@@ -241,7 +241,7 @@
         // 마커를 표시할 위치와 내용을 가지고 있는 객체 배열입니다
         async function loadStores() {
           try {
-            const response = await fetch("http://192.168.55.194:8002/stores");
+            const response = await fetch("http://localhost:8002/stores");
             const stores = await response.json();
             stores.forEach((store) => {
               let pos = new kakao.maps.LatLng(store.x_coordinate, store.y_coordinate);
@@ -305,7 +305,7 @@
             modalTitle.textContent = store.name;
 
             const menuResponse = await fetch(
-              `http://192.168.55.194:8002/stores/${store.idx}/menu`
+              `http://localhost:8002/stores/${store.idx}/menu`
             );
             const menuData = await menuResponse.json();
             var menuList = "";
