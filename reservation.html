@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kakao Map with Modal</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center; /* 수평 가운데 정렬 */
+        align-items: center; /* 수직 가운데 정렬 */
+        height: 100vh;
+        margin: 0;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+        border: 1px solid #000;
+      }
+
+      section {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      #site-header {
+        background-color: #cfe5d8d3;
+        height: 65px;
+        width: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #logo {
+        font-size: 2rem; /* 로고의 크기 */
+        font-weight: bold; /* 굵은 글씨 */
+        color: hsla(128, 85%, 47%, 0.233); /* 글씨 색상 */
+        text-transform: uppercase; /* 대문자로 변환 */
+        letter-spacing: 2px; /* 글자 사이 간격 */
+        background: linear-gradient(
+          45deg,
+          #539546,
+          #18d10b
+        ); /* 그라데이션 배경 */
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        padding: 10px 20px;
+        text-align: center;
+      }
+
+      footer {
+        background-color: #cfe5d8d3;
+        padding: 10px 0;
+        text-align: center;
+        width: 100%;
+      }
+      footer ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+      footer li {
+        display: inline;
+        margin: 0 15px;
+      }
+      footer a {
+        text-decoration: none;
+        color: #333;
+      }
+      footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header id="site-header">
+        <div id="logo">GFOOD</div>
+      </header>
+      <section>
+        <ul id="reservationList"></ul>
+      </section>
+      <footer>
+        <ul>
+          <li><a href="search.html" id="search">검색</a></li>
+          <li><a href="reservation.html" id="reservation">예약</a></li>
+          <li><a href="profile.html" id="profile">회원정보</a></li>
+          <li><a href="index.html" id="back">홈</a></li>
+        </ul>
+      </footer>
+    </div>
+    <script>
+      const exUserId = 1;
+      fetch(`http://127.0.0.1:8000/users/${exUserId}/reservation`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          for (i = 0; i < data.length; i++) {
+            const li = document.createElement("li");
+
+            // Create the <span> for the date and time
+            const dateTimeSpan = document.createElement("span");
+            dateTimeSpan.className = "datetime";
+            dateTimeSpan.textContent = data[i].reservation_datetime + " ";
+
+            // Create the <span> for the store
+            const storeSpan = document.createElement("span");
+            storeSpan.className = "store";
+            storeSpan.textContent = data[i].store_name;
+
+            // Append the <span> elements to the <li>
+            li.appendChild(dateTimeSpan);
+            li.appendChild(storeSpan);
+
+            // Append the <li> to the <ul>
+            const reservationList = document.getElementById("reservationList");
+            reservationList.appendChild(li);
+          }
+        })
+        .catch((error) => {
+          console.error(
+            "There has been a problem with your fetch operation:",
+            error
+          );
+        });
+    </script>
+  </body>
+</html>

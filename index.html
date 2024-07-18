@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,7 +11,24 @@
       /* 수평 가운데 정렬 */
       align-items: center;
       /* 수직 가운데 정렬 */
+      height: 100vh;
+      margin: 0;
     }
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+      }
+
+      section {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
 
     .overlay-content {
       display: flex;
@@ -73,6 +89,13 @@
       background: #ffffff;
       border-radius: 20px;
     }
+      #map {
+        width: 500px;
+        height: 100%;
+        filter: none;
+        transition: filter 0.2s;
+      }
+
 
     .modal .modal_popup .close_btn {
       display: block;
@@ -91,6 +114,15 @@
     #modalContent {
       text-align: center;
     }
+      #site-header {
+        background-color: #cfe5d8d3;
+        height: 65px;
+        width: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
 
     #map {
       width: 100%;
@@ -121,118 +153,172 @@
       /* 글자 사이 간격 */
       background: linear-gradient(45deg,
           #539546,
-          #18d10b);
-      /* 그라데이션 배경 */
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      padding: 10px 20px;
-      text-align: center;
-    }
-  </style>
-  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0483db3a4bdedf858905037e9fe907c9"></script>
-  </head>
-  
-  <body>
-    <!-- 모달 팝업 -->
-    <div class="modal">
-      <div class="modal_popup">
-        <h3 id="modalTitle"></h3>
-        <span id="modalContent"></span>
-        <button type="button" class="close_btn">닫기</button>
-      </div>
-    </div>
-    <!-- end 모달 팝업 -->
-  
-    <main>
-      <header id="site-header">
-        <div id="logo">GFOOD</div>
-      </header>
-      <section>
-        <div id="map" style="width: 500px; height: 600px"></div>
-      </section>
-  </main>
-
-  <script>
-    const modal = document.querySelector(".modal");
-    const modalClose = document.querySelector(".close_btn");
-    const mapElement = document.getElementById("map");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalContent = document.getElementById("modalContent");
-
-    // 닫기 버튼을 눌렀을 때 모달팝업이 닫힘
-    modalClose.addEventListener("click", function () {
-      modal.style.display = "none";
-      mapElement.classList.remove("blur"); // 지도 흐리게 제거
-    });
-    var mapContainer = document.getElementById("map"); // 지도를 담을 영역의 DOM 레퍼런스
-    var mapOption = {
-      // 지도를 생성할 때 필요한 기본 옵션
-      center: new kakao.maps.LatLng(37.5745, 126.986), // 지도의 중심좌표
-      level: 4, // 지도의 레벨(확대, 축소 정도)
-    };
-    var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성 및 객체 리턴
-
-    let listEndOverlay = [];
-    // 마커를 표시할 위치와 내용을 가지고 있는 객체 배열입니다
-    async function loadStores() {
-      try {
-        const response = await fetch("http://192.168.55.194:8002/stores");
-        const stores = await response.json();
-        stores.forEach((store) => {
-          let pos = new kakao.maps.LatLng(store.x_coordinate, store.y_coordinate);
-          const marker = new kakao.maps.Marker({
-            map: map,
-            position: pos
-          });
-          
-          var overlayContent = document.createElement('div');
-          overlayContent.innerHTML = `<div class="overlay-content">
-              <h3> ${store.name} </h3>
-              <span> ${store.type} </span>
-            </div>`;
-          overlayContent.querySelector('.overlay-content').onclick = function() {
-              getDetail(store);
-          };
-          var overlay = new kakao.maps.CustomOverlay({
-            position: pos,
-            content: overlayContent,
-          }); 
-          kakao.maps.event.addListener(marker, 'click', function () {
-            listEndOverlay.push(overlay);
-            overlay.setMap(map);
-          })
-          //kakao.maps.event.addListener(marker, 'mouseout', function(){overlay.close()})
-          
-        });
-      } catch (error) {
-        console.error("Error fetching store data:", error);
+          #18d10b
+        ); /* 그라데이션 배경 */
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        padding: 10px 20px;
+        text-align: center;
       }
-    }
-      async function getDetail(store) {
-        while(listEndOverlay.length > 0){
-          listEndOverlay.pop().setMap(null);
-        }
-        try {
-          modal.style.display = "block";
-          mapElement.classList.add("blur"); // 지도 흐리게
-          modalTitle.textContent = store.name;
 
-          const menuResponse = await fetch(
-            `http://192.168.55.194:8002/stores/${store.idx}/menu`
-          );
-          const menuData = await menuResponse.json();
-          var menuList = "";
-          for (i = 0; i < menuData.length; i++) {
-            menuList += `${menuData[i].name} : ${menuData[i].price}\n`;
+      footer {
+        background-color: #cfe5d8d3;
+        padding: 10px 0;
+        text-align: center;
+        width: 100%;
+      }
+      footer ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+      footer li {
+        display: inline;
+        margin: 0 15px;
+      }
+      footer a {
+        text-decoration: none;
+        color: #333;
+      }
+      footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0483db3a4bdedf858905037e9fe907c9"></script>
+    </head>
+    
+    <body>
+      <!-- 모달 팝업 -->
+      <div class="modal">
+        <div class="modal_popup">
+          <h3 id="modalTitle"></h3>
+          <span id="modalContent"></span>
+          <button type="button" class="close_btn">닫기</button>
+        </div>
+      </div>
+      <!-- end 모달 팝업 -->
+    
+    
+      <div class="container">
+        <header id="site-header">
+          <div id="logo">GFOOD</div>
+        </header>
+        <section>
+          <div id="map"></div>
+        </section>
+        <footer>
+          <ul>
+            <li><a href="search.html" id="search">검색</a></li>
+            <li><a href="reservation.html" id="reservation">예약</a></li>
+            <li><a href="profile.html" id="profile">회원정보</a></li>
+            <li><a href="index.html" id="back">홈</a></li>
+          </ul>
+        </footer>
+      </div>
+    
+    
+      <script>
+        const modal = document.querySelector(".modal");
+        const modalClose = document.querySelector(".close_btn");
+        const mapElement = document.getElementById("map");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalContent = document.getElementById("modalContent");
+
+        // 닫기 버튼을 눌렀을 때 모달팝업이 닫힘
+        modalClose.addEventListener("click", function () {
+          modal.style.display = "none";
+          mapElement.classList.remove("blur"); // 지도 흐리게 제거
+        });
+        var mapContainer = document.getElementById("map"); // 지도를 담을 영역의 DOM 레퍼런스
+        var mapOption = {
+          // 지도를 생성할 때 필요한 기본 옵션
+          center: new kakao.maps.LatLng(37.5745, 126.986), // 지도의 중심좌표
+          level: 4, // 지도의 레벨(확대, 축소 정도)
+        };
+        var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성 및 객체 리턴
+        let listEndOverlay = [];
+        // 마커를 표시할 위치와 내용을 가지고 있는 객체 배열입니다
+        async function loadStores() {
+          try {
+            const response = await fetch("http://192.168.55.194:8002/stores");
+            const stores = await response.json();
+            stores.forEach((store) => {
+              let pos = new kakao.maps.LatLng(store.x_coordinate, store.y_coordinate);
+              const marker = new kakao.maps.Marker({
+                map: map,
+                position: pos,
+              });
+
+              kakao.maps.event.addListener(marker, "click", async function () {
+                try {
+                  modal.style.display = "block";
+                  mapElement.classList.add("blur"); // 지도 흐리게
+                  modalTitle.textContent = store.name;
+
+                  const menuResponse = await fetch(
+                    `http://127.0.0.1:8000/stores/${store.idx}/menu`
+                  );
+                  const menuData = await menuResponse.json();
+                  console.log(menuData);
+                  var menuList = "";
+                  for (i = 0; i < menuData.length; i++) {
+                    menuList += `${menuData[i].name} : ${menuData[i].price}\n`;
+                  }
+                  modalContent.innerText = menuList;
+                } catch (error) {
+                  console.error("Error fetching menu data:", error);
+                }
+              });
+            });
+
+            var overlayContent = document.createElement('div');
+            overlayContent.innerHTML = `<div class="overlay-content">
+                    <h3> ${store.name} </h3>
+                    <span> ${store.type} </span>
+                  </div>`;
+            overlayContent.querySelector('.overlay-content').onclick = function () {
+              getDetail(store);
+            };
+            var overlay = new kakao.maps.CustomOverlay({
+              position: pos,
+              content: overlayContent,
+            });
+            kakao.maps.event.addListener(marker, 'click', function () {
+              listEndOverlay.push(overlay);
+              overlay.setMap(map);
+            })
+            //kakao.maps.event.addListener(marker, 'mouseout', function(){overlay.close()})
+
           }
-          modalContent.innerText = menuList;
-        } catch (error) {
-          console.error("Error fetching menu data:", error);
+          catch (error) {
+            console.error("Error fetching store data:", error);
+          }
         }
-      };
-      loadStores();
-    </script>
-</body>
+        async function getDetail(store) {
+          while (listEndOverlay.length > 0) {
+            listEndOverlay.pop().setMap(null);
+          }
+          try {
+            modal.style.display = "block";
+            mapElement.classList.add("blur"); // 지도 흐리게
+            modalTitle.textContent = store.name;
 
-</html>
+            const menuResponse = await fetch(
+              `http://192.168.55.194:8002/stores/${store.idx}/menu`
+            );
+            const menuData = await menuResponse.json();
+            var menuList = "";
+            for (i = 0; i < menuData.length; i++) {
+              menuList += `${menuData[i].name} : ${menuData[i].price}\n`;
+            }
+            modalContent.innerText = menuList;
+          } catch (error) {
+            console.error("Error fetching menu data:", error);
+          }
+        };
+        loadStores();
+      </script>
+    </body>
+    
+    </html>
