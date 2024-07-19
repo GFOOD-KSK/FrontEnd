@@ -168,7 +168,7 @@
             document.getElementById("list").innerText = "";
             for (i = 0; i < data.length; i++) {
               const newLiElement = document.createElement("li");
-              newLiElement.innerText = `${data[i].name}  ${data[i].menu_name} ${data[i].menu_price}\n`;
+              newLiElement.innerText = `${data[i].store_name}  ${data[i].name} ${data[i].price}\n`;
               ulElement.appendChild(newLiElement);
             }
           })
