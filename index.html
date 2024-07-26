@@ -14,6 +14,7 @@
         height: 100vh;
         margin: 0;
       }
+
       .container {
         display: flex;
         flex-direction: column;
@@ -67,6 +68,24 @@
         /* 넘치는 텍스트 생략 표시 (...) */
       }
 
+      .header-button {
+            background-color: #4CAF50; /* 배경색 설정 */
+            color: white; /* 텍스트 색상 설정 */
+            border: none; /* 테두리 제거 */
+            padding: 10px 20px; /* 패딩 설정 */
+            text-align: center; /* 텍스트 가운데 정렬 */
+            text-decoration: none; /* 텍스트 밑줄 제거 */
+            display: inline-block; /* 인라인 블록 설정 */
+            font-size: 16px; /* 폰트 크기 설정 */
+            margin: 4px 2px; /* 마진 설정 */
+            cursor: pointer; /* 커서 모양 설정 */
+            border-radius: 4px; /* 모서리 둥글게 설정 */
+        }
+
+        .header-button:hover {
+            background-color: #45a049; /* 마우스 오버 시 배경색 설정 */
+        }
+
       .modal {
         display: none;
         /* 평소에는 보이지 않도록 설정 */
@@ -89,6 +108,7 @@
         background: #ffffff;
         border-radius: 20px;
       }
+
       #map {
         width: 500px;
         height: 100%;
@@ -113,9 +133,19 @@
       #modalContent {
         text-align: center;
       }
+
       #site-header {
         background-color: #cfe5d8d3;
         height: 65px;
+        width: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #butten-header {
+        background-color: #cfe5d8d3;
+        height: 25px;
         width: 500px;
         display: flex;
         justify-content: center;
@@ -133,11 +163,6 @@
         filter: blur(5px);
       }
 
-      #site-header {
-        background-color: #cfe5d8d3;
-        height: 65px;
-      }
-
       #logo {
         font-size: 2rem;
         /* 로고의 크기 */
@@ -147,10 +172,10 @@
         /* 글씨 색상 */
         text-transform: uppercase;
         /* 대문자로 변환 */
-        letter-spacing: 2px;
+        letter-spacing: 1px;
         /* 글자 사이 간격 */
         background: linear-gradient(
-          45deg,
+          25deg,
           #539546,
           #18d10b
         ); /* 그라데이션 배경 */
@@ -167,6 +192,7 @@
         text-align: center;
         width: 100%;
       }
+
       footer ul {
         list-style-type: none;
         padding: 0;
@@ -176,13 +202,16 @@
         display: inline;
         margin: 0 15px;
       }
+
       footer a {
         text-decoration: none;
         color: #333;
       }
+
       footer a:hover {
         text-decoration: underline;
       }
+
     </style>
     <script
       type="text/javascript"
@@ -191,6 +220,9 @@
   </head>
 
   <body>
+    <!--jQuery 라이브러리-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY"></script>
     <!-- 모달 팝업 -->
     <div class="modal">
       <div class="modal_popup">
@@ -199,21 +231,24 @@
         <button type="button" class="close_btn">닫기</button>
       </div>
     </div>
-    <!-- end 모달 팝업 -->
 
+    <!-- end 모달 팝업 -->
     <div class="container">
       <header id="site-header">
         <div id="logo">GFOOD</div>
+        <button class="header-button" id="a-button" data-type="a">결식 카드</button>
+        <button class="header-button" id="b-button" data-type="b">착한식당</button>
+        <button class="header-button" id="c-button" data-type="c">편의점</button>
       </header>
       <section>
         <div id="map"></div>
       </section>
       <footer>
         <ul>
+          <li><a href="index.html" id="back">홈</a></li>
           <li><a href="search.html" id="search">검색</a></li>
           <li><a href="reservation.html" id="reservation">예약</a></li>
           <li><a href="profile.html" id="profile">회원정보</a></li>
-          <li><a href="index.html" id="back">홈</a></li>
         </ul>
       </footer>
     </div>
@@ -230,6 +265,7 @@
         modal.style.display = "none";
         mapElement.classList.remove("blur"); // 지도 흐리게 제거
       });
+
       var mapContainer = document.getElementById("map"); // 지도를 담을 영역의 DOM 레퍼런스
       var mapOption = {
         // 지도를 생성할 때 필요한 기본 옵션
@@ -237,76 +273,131 @@
         level: 4, // 지도의 레벨(확대, 축소 정도)
       };
       var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성 및 객체 리턴
+
+      let markers = [];
       let listEndOverlay = [];
-      // 마커를 표시할 위치와 내용을 가지고 있는 객체 배열입니다
-      async function loadStores() {
+      let currentType = null;
+
+
+      // <!-- 마커 이미지 설정용 -->
+
+
+    const markerImages = {
+      a: "https://ifh.cc/g/yHPtBj.png", 
+      b: "https://ifh.cc/g/500jMW.png", 
+      c: "https://ifh.cc/g/pxATFR.png"
+    };
+
+    // 서버에서 데이터를 가져오는 함수
+    function getData(type) {
+      return $.ajax({
+        url: '/get-locations', // 서버의 엔드포인트
+        method: 'GET',
+        data: { business_type: type },
+        dataType: 'json'
+      });
+    }
+      // 마커를 지도에 추가하는 함수
+      function addMarker(store) {
+        let pos = new kakao.maps.LatLng(store.x_coordinate, store.y_coordinate);
+
+        // 타입에 따른 마커 이미지 설정용
+        const imageSrc = 'https://ifh.cc/g/500jMW.png'; // markerImages[store.type]; -> 임시 지정 DB값 에따라 변경하도록
+        const imageSize = new kakao.maps.Size(94, 99); // 마커 이미지 크기
+        const imageOption = { offset: new kakao.maps.Point(27, 69) }; // 마커 이미지의 중심좌표 설정
+
+        const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+        //마커 생성용
+        const marker = new kakao.maps.Marker({
+          map: map,
+          position: pos,
+          image: markerImage // 마커 이미지 설정
+        });
+
+      kakao.maps.event.addListener(marker, "click", async function () {
         try {
-          const location = map.getCenter();
-          const response = await fetch(`http://localhost:8002/stores?lat=${location.getLat()}&lng=${location.getLng()}`);
-          const stores = await response.json();
-          stores.forEach((store) => {
-            let pos = new kakao.maps.LatLng(
-              store.x_coordinate,
-              store.y_coordinate
-            );
-            const marker = new kakao.maps.Marker({
-              map: map,
+            var overlayContent = document.createElement("div");
+            overlayContent.innerHTML = `<div class="overlay-content">
+            <h3> ${store.name} </h3>
+            <span> ${store.type} </span>
+            </div>`;
+            overlayContent.querySelector(".overlay-content").onclick = function () {
+              getDetail(store);
+            };
+            var overlay = new kakao.maps.CustomOverlay({
               position: pos,
+              content: overlayContent,
             });
-
-            kakao.maps.event.addListener(marker, "click", async function () {
-              try {
-                var overlayContent = document.createElement("div");
-                overlayContent.innerHTML = `<div class="overlay-content">
-                    <h3> ${store.name} </h3>
-                    <span> ${store.type} </span>
-                  </div>`;
-                overlayContent.querySelector(".overlay-content").onclick =
-                  function () {
-                    getDetail(store);
-                  };
-                var overlay = new kakao.maps.CustomOverlay({
-                  position: pos,
-                  content: overlayContent,
-                });
-                kakao.maps.event.addListener(marker, "click", function () {
-                  listEndOverlay.push(overlay);
-                  overlay.setMap(map);
-                });
-              } catch (error) {
-                console.error("Error fetching menu data:", error);
-              }
-            });
-          });
-
-          //kakao.maps.event.addListener(marker, 'mouseout', function(){overlay.close()})
-        } catch (error) {
-          console.error("Error fetching store data:", error);
-        }
-      }
-      async function getDetail(store) {
-        while (listEndOverlay.length > 0) {
-          listEndOverlay.pop().setMap(null);
-        }
-        try {
-          modal.style.display = "block";
-          mapElement.classList.add("blur"); // 지도 흐리게
-          modalTitle.textContent = store.name;
-
-          const menuResponse = await fetch(
-            `http://127.0.0.1:8002/stores/${store.idx}/menu`
-          );
-          const menuData = await menuResponse.json();
-          var menuList = "";
-          for (i = 0; i < menuData.length; i++) {
-            menuList += `${menuData[i].name} : ${menuData[i].price}\n`;
-          }
-          modalContent.innerText = menuList;
-        } catch (error) {
+            listEndOverlay.push(overlay);
+            overlay.setMap(map);
+        } 
+        catch (error) {
           console.error("Error fetching menu data:", error);
         }
-      };
-      kakao.maps.event.addListener(map, 'dragend', loadStores)
+        });
+
+      markers.push(marker);
+      }
+
+    // 기존 마커를 모두 제거하는 함수
+    function clearMarkers() {
+      markers.forEach(marker => marker.setMap(null));
+      markers = [];
+  }
+
+  // 특정 타입의 데이터를 로드하는 함수
+  async function loadStores(type) {
+    try {
+      const location = map.getCenter();
+      const response = await fetch(`http://localhost:8002/stores?type=${type}&lat=${location.getLat()}&lng=${location.getLng()}`);
+      const stores = await response.json();
+      clearMarkers();
+      stores.forEach(store => addMarker(store));
+    } 
+    catch (error) {
+      console.error("Error fetching store data:", error);
+    }
+  }
+
+   // 버튼 클릭 이벤트 처리
+   document.querySelectorAll('.header-button').forEach(button => {
+    button.addEventListener('click', function () {
+      const currentType = this.getAttribute('data-type');
+      getData(currentType).done(function(locations) {
+        createMarkers(locations);
+      });
+    });
+  });
+
+   // 지도 드래그 종료 시 마커 재로드
+  kakao.maps.event.addListener(map, 'dragend', function () {
+    if (currentType) {
+      loadStores(currentType);
+    }
+  });
+
+  async function getDetail(store) {
+    while (listEndOverlay.length > 0) {
+      listEndOverlay.pop().setMap(null);
+    }
+    try {
+      modal.style.display = "block";
+      mapElement.classList.add("blur"); // 지도 흐리게
+      modalTitle.textContent = store.name;
+
+      const menuResponse = await fetch(`http://127.0.0.1:8002/stores/${store.idx}/menu`);
+      const menuData = await menuResponse.json();
+      var menuList = "";
+      for (let i = 0; i < menuData.length; i++) {
+        menuList += `${menuData[i].name} : ${menuData[i].price}\n`;
+      }
+      modalContent.innerText = menuList;
+    } 
+    catch (error) {
+      console.error("Error fetching menu data:", error);
+    }
+  }
+
     </script>
   </body>
 </html>

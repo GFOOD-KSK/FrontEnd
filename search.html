@@ -145,10 +145,10 @@
       </section>
       <footer>
         <ul>
+          <li><a href="index.html" id="back">홈</a></li>
           <li><a href="search.html" id="search">검색</a></li>
           <li><a href="reservation.html" id="reservation">예약</a></li>
           <li><a href="profile.html" id="profile">회원정보</a></li>
-          <li><a href="index.html" id="back">홈</a></li>
         </ul>
       </footer>
     </div>
@@ -178,6 +178,11 @@
               error
             );
           });
+          document.getElementById("searchInput").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+          searchData();
+        }
+      });
       }
     </script>
   </body>
