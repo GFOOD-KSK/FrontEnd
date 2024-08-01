@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kakao Map with Modal</title>
+    <!-- Google Material Icons 폰트 로드 -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
       body {
         display: flex;
@@ -211,7 +213,13 @@
       footer a:hover {
         text-decoration: underline;
       }
-
+      .material-symbols-outlined {
+      font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24
+    }
     </style>
     <script
       type="text/javascript"
@@ -236,168 +244,290 @@
     <div class="container">
       <header id="site-header">
         <div id="logo">GFOOD</div>
-        <button class="header-button" id="a-button" data-type="a">결식 카드</button>
-        <button class="header-button" id="b-button" data-type="b">착한식당</button>
-        <button class="header-button" id="c-button" data-type="c">편의점</button>
+        <button class="header-button" id="a-button" data-type="a" data-icon="https://ifh.cc/g/yHPtBj.png">결식 카드</button>
+        <button class="header-button" id="b-button" data-type="b" data-icon="https://ifh.cc/g/500jMW.png">착한식당</button>
+        <button class="header-button" id="c-button" data-type="c" data-icon="https://ifh.cc/g/pxATFR.png">편의점</button>
+
       </header>
       <section>
         <div id="map"></div>
       </section>
       <footer>
         <ul>
-          <li><a href="index.html" id="back">홈</a></li>
-          <li><a href="search.html" id="search">검색</a></li>
-          <li><a href="reservation.html" id="reservation">예약</a></li>
-          <li><a href="profile.html" id="profile">회원정보</a></li>
+            <li><a href="index.html" id="back"><span class="material-symbols-outlined">home</span>홈</a></li>
+            <li><a href="search.html" id="search"><span class="material-symbols-outlined">search</span>검색</a></li>
+            <li><a href="reservation.html" id="reservation"><span class="material-symbols-outlined">event</span>예약</a></li>
+            <li><a href="profile.html" id="profile"><span class="material-symbols-outlined">person</span>회원정보</a></li>
         </ul>
+    </footer>
       </footer>
     </div>
-
     <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          // 모달, 닫기 버튼, 지도 요소, 모달 제목 및 내용 요소를 선택
+          const modal = document.querySelector(".modal");
+          const modalClose = document.querySelector(".close_btn");
+          const mapElement = document.getElementById("map");
+          const modalTitle = document.getElementById("modalTitle");
+          const modalContent = document.getElementById("modalContent");
+  
+          // 모달 닫기 버튼 클릭 시 모달 숨기기 및 지도 블러 제거
+          modalClose.addEventListener("click", function () {
+              modal.style.display = "none";
+              mapElement.classList.remove("blur");
+          });
+  
+          // 모달 외부 클릭 시 모달 숨기기
+          window.addEventListener("click", function (event) {
+              if (event.target == modal) {
+                  modal.style.display = "none";
+                  mapElement.classList.remove("blur");
+              }
+          });
+  
+          // 지도 초기 설정
+          const mapOption = {
+              center: new kakao.maps.LatLng(37.5206, 126.9945),
+              level: 4
+          };
+  
+          // 지도 객체 생성
+          const map = new kakao.maps.Map(mapElement, mapOption);
+          let markers = []; // 마커 배열
+          let currentOverlay = null; // 현재 오버레이 저장 변수
+          let currentType = null; // 현재 선택된 타입 저장 변수
+  
+          // 선택된 타입에 따른 좌표 데이터 가져오기
+          async function getCoordinatesByType(type) {
+              try {
+                  const response = await fetch(`http://localhost:8002/stores?business_type=${type}`);
+                  if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                  }
+                  const coordinates = await response.json();
+                  return coordinates; // 좌표 반환
+              } catch (error) {
+                  console.error("Error fetching coordinates data:", error);
+                  alert("상점 데이터를 불러오는 데 실패했습니다. 나중에 다시 시도해 주세요.");
+                  return []; // 빈 배열 반환
+              }
+          }
+  
+          // 버튼 클릭 시 마커 추가
+          document.querySelectorAll(".header-button").forEach(button => {
+              button.addEventListener("click", async function () {
+                  const type = this.getAttribute("data-type");
+                  const markerIcon = this.getAttribute("data-icon");
+                  await markertype(type, markerIcon); // 마커 타입에 따라 마커 추가
+              });
+          });
+  
+          // 마커 추가 함수
+          function addMarker(store, markerIcon) {
+              const pos = new kakao.maps.LatLng(store.x_coordinate, store.y_coordinate);
+              const imageSize = new kakao.maps.Size(94, 99);
+              const imageOption = { offset: new kakao.maps.Point(44, 79) };
+              const markerImage = new kakao.maps.MarkerImage(markerIcon, imageSize, imageOption);
+              const marker = new kakao.maps.Marker({
+                  map: map,
+                  position: pos,
+                  image: markerImage
+              });
+  
+              // 마커 클릭 시 오버레이 표시
+              kakao.maps.event.addListener(marker, "click", function () {
+                  if (currentOverlay) {
+                      currentOverlay.setMap(null); // 이전 오버레이 제거
+                  }
+  
+                  const overlayContent = document.createElement("div");
+                  overlayContent.innerHTML = `<div class="overlay-content">
+                      <h3>${store.name}</h3>
+                      <span>${store.type}</span>
+                  </div>`;
+                  overlayContent.querySelector(".overlay-content").onclick = function () {
+                      getDetail(store); // 상세 정보 보기
+                  };
+                  const overlay = new kakao.maps.CustomOverlay({
+                      position: pos,
+                      content: overlayContent,
+                  });
+  
+                  currentOverlay = overlay; // 현재 오버레이 업데이트
+                  overlay.setMap(map); // 오버레이 지도에 표시
+              });
+              markers.push(marker); // 마커 배열에 추가
+          }
+  
+          // 모든 마커 제거 함수
+          function clearMarkers() {
+              markers.forEach(marker => marker.setMap(null)); // 지도에서 마커 제거
+              markers = []; // 마커 배열 초기화
+          }
+  
+          // 지도를 초기화하는 함수
+          function resetMap() {
+              map.setCenter(new kakao.maps.LatLng(37.5206, 126.9945)); // 지도 중심 설정
+              map.setLevel(4); // 지도 레벨 설정
+          }
+  
+          // 마커 타입에 따라 좌표 데이터 가져오기
+          async function markertype(type, markerIcon) {
+              try {
+                  const coordinates = await getCoordinatesByType(type);
+                  resetMap(); // 지도를 초기화
+                  clearMarkers(); // 이전 마커 제거
+                  coordinates.forEach(coord => {
+                      const store = {
+                          x_coordinate: coord.lat,
+                          y_coordinate: coord.lng,
+                          name: coord.name,
+                          type: coord.type,
+                      };
+                      addMarker(store, markerIcon); // 마커 추가
+                  });
+              } catch (error) {
+                  console.error("Error fetching store data:", error);
+              }
+          }
+  
+          // 상세 정보 가져오기
+          async function getDetail(store) {
+              try {
+                  const response = await fetch(`http://localhost:8002/store-detail?id=${store.id}`);
+                  if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                  }
+                  const detail = await response.json();
+                  modalTitle.textContent = detail.name; // 모달 제목 설정
+                  modalContent.textContent = `타입: ${detail.type}\n주소: ${detail.address}\n상세 정보: ${detail.description}`; // 모달 내용 설정
+                  modal.style.display = "block"; // 모달 표시
+                  mapElement.classList.add("blur"); // 지도 블러 처리
+              } catch (error) {
+                  console.error("Error fetching store detail:", error);
+              }
+          }
+      });
+  </script>
+  
+  
+</body>
+</html>
+<!--좌표 이미지 확인용 -->
+<!-- <script>
+  document.addEventListener("DOMContentLoaded", function () {
       const modal = document.querySelector(".modal");
       const modalClose = document.querySelector(".close_btn");
       const mapElement = document.getElementById("map");
       const modalTitle = document.getElementById("modalTitle");
       const modalContent = document.getElementById("modalContent");
 
-      // 닫기 버튼을 눌렀을 때 모달팝업이 닫힘
       modalClose.addEventListener("click", function () {
-        modal.style.display = "none";
-        mapElement.classList.remove("blur"); // 지도 흐리게 제거
+          modal.style.display = "none";
+          mapElement.classList.remove("blur");
       });
 
-      var mapContainer = document.getElementById("map"); // 지도를 담을 영역의 DOM 레퍼런스
-      var mapOption = {
-        // 지도를 생성할 때 필요한 기본 옵션
-        center: new kakao.maps.LatLng(37.5206, 126.9945), // 지도의 중심좌표
-        level: 4, // 지도의 레벨(확대, 축소 정도)
+      window.addEventListener("click", function (event) {
+          if (event.target == modal) {
+              modal.style.display = "none";
+              mapElement.classList.remove("blur");
+          }
+      });
+
+      const mapOption = {
+          center: new kakao.maps.LatLng(37.5206, 126.9945),
+          level: 4
       };
-      var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성 및 객체 리턴
 
+      const map = new kakao.maps.Map(mapElement, mapOption);
       let markers = [];
-      let listEndOverlay = [];
-      let currentType = null;
+      let currentOverlay = null;
 
+      // 리스트 데이터
+      const storeData = [
+          { id: 1, coordinates: { lat: 37.5206, lng: 126.9945 }, name: "가게 A1", type: "a" },
+          { id: 2, coordinates: { lat: 37.5210, lng: 126.9950 }, name: "가게 A2", type: "a" },
+          { id: 3, coordinates: { lat: 37.5220, lng: 126.9960 }, name: "가게 B1", type: "b" },
+          { id: 4, coordinates: { lat: 37.5230, lng: 126.9970 }, name: "가게 B2", type: "b" },
+          { id: 5, coordinates: { lat: 37.5240, lng: 126.9980 }, name: "가게 C1", type: "c" },
+          { id: 6, coordinates: { lat: 37.5250, lng: 126.9990 }, name: "가게 C2", type: "c" }
+      ];
 
-      // <!-- 마커 이미지 설정용 -->
+      async function getCoordinatesByType(type) {
+          return storeData.filter(store => store.type === type);
+      }
 
-
-    const markerImages = {
-      a: "https://ifh.cc/g/yHPtBj.png", 
-      b: "https://ifh.cc/g/500jMW.png", 
-      c: "https://ifh.cc/g/pxATFR.png"
-    };
-
-    // 서버에서 데이터를 가져오는 함수
-    function getData(type) {
-      return $.ajax({
-        url: '/get-locations', // 서버의 엔드포인트
-        method: 'GET',
-        data: { business_type: type },
-        dataType: 'json'
+      document.querySelectorAll(".header-button").forEach(button => {
+          button.addEventListener("click", async function () {
+              const type = this.getAttribute("data-type");
+              const markerIcon = this.getAttribute("data-icon");
+              await markertype(type, markerIcon);
+          });
       });
-    }
-      // 마커를 지도에 추가하는 함수
-      function addMarker(store) {
-        let pos = new kakao.maps.LatLng(store.x_coordinate, store.y_coordinate);
 
-        // 타입에 따른 마커 이미지 설정용
-        const imageSrc = 'https://ifh.cc/g/500jMW.png'; // markerImages[store.type]; -> 임시 지정 DB값 에따라 변경하도록
-        const imageSize = new kakao.maps.Size(94, 99); // 마커 이미지 크기
-        const imageOption = { offset: new kakao.maps.Point(27, 69) }; // 마커 이미지의 중심좌표 설정
-
-        const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
-        //마커 생성용
-        const marker = new kakao.maps.Marker({
-          map: map,
-          position: pos,
-          image: markerImage // 마커 이미지 설정
-        });
-
-      kakao.maps.event.addListener(marker, "click", async function () {
-        try {
-            var overlayContent = document.createElement("div");
-            overlayContent.innerHTML = `<div class="overlay-content">
-            <h3> ${store.name} </h3>
-            <span> ${store.type} </span>
-            </div>`;
-            overlayContent.querySelector(".overlay-content").onclick = function () {
-              getDetail(store);
-            };
-            var overlay = new kakao.maps.CustomOverlay({
+      function addMarker(store, markerIcon) {
+          const pos = new kakao.maps.LatLng(store.coordinates.lat, store.coordinates.lng);
+          const imageSize = new kakao.maps.Size(94, 99);
+          const imageOption = { offset: new kakao.maps.Point(44, 79) };
+          const markerImage = new kakao.maps.MarkerImage(markerIcon, imageSize, imageOption);
+          const marker = new kakao.maps.Marker({
+              map: map,
               position: pos,
-              content: overlayContent,
-            });
-            listEndOverlay.push(overlay);
-            overlay.setMap(map);
-        } 
-        catch (error) {
-          console.error("Error fetching menu data:", error);
-        }
-        });
+              image: markerImage
+          });
 
-      markers.push(marker);
+          kakao.maps.event.addListener(marker, "click", function () {
+              if (currentOverlay) {
+                  currentOverlay.setMap(null);
+              }
+
+              const overlayContent = document.createElement("div");
+              overlayContent.innerHTML = `<div class="overlay-content">
+                  <h3>${store.name}</h3>
+                  <span>타입: ${store.type}</span>
+              </div>`;
+              overlayContent.querySelector(".overlay-content").onclick = function () {
+                  getDetail(store);
+              };
+              const overlay = new kakao.maps.CustomOverlay({
+                  position: pos,
+                  content: overlayContent,
+              });
+
+              currentOverlay = overlay;
+              overlay.setMap(map);
+          });
+          markers.push(marker);
       }
 
-    // 기존 마커를 모두 제거하는 함수
-    function clearMarkers() {
-      markers.forEach(marker => marker.setMap(null));
-      markers = [];
-  }
-
-  // 특정 타입의 데이터를 로드하는 함수
-  async function loadStores(type) {
-    try {
-      const location = map.getCenter();
-      const response = await fetch(`http://localhost:8002/stores?type=${type}&lat=${location.getLat()}&lng=${location.getLng()}`);
-      const stores = await response.json();
-      clearMarkers();
-      stores.forEach(store => addMarker(store));
-    } 
-    catch (error) {
-      console.error("Error fetching store data:", error);
-    }
-  }
-
-   // 버튼 클릭 이벤트 처리
-   document.querySelectorAll('.header-button').forEach(button => {
-    button.addEventListener('click', function () {
-      const currentType = this.getAttribute('data-type');
-      getData(currentType).done(function(locations) {
-        createMarkers(locations);
-      });
-    });
-  });
-
-   // 지도 드래그 종료 시 마커 재로드
-  kakao.maps.event.addListener(map, 'dragend', function () {
-    if (currentType) {
-      loadStores(currentType);
-    }
-  });
-
-  async function getDetail(store) {
-    while (listEndOverlay.length > 0) {
-      listEndOverlay.pop().setMap(null);
-    }
-    try {
-      modal.style.display = "block";
-      mapElement.classList.add("blur"); // 지도 흐리게
-      modalTitle.textContent = store.name;
-
-      const menuResponse = await fetch(`http://127.0.0.1:8002/stores/${store.idx}/menu`);
-      const menuData = await menuResponse.json();
-      var menuList = "";
-      for (let i = 0; i < menuData.length; i++) {
-        menuList += `${menuData[i].name} : ${menuData[i].price}\n`;
+      function clearMarkers() {
+          markers.forEach(marker => marker.setMap(null));
+          markers = [];
       }
-      modalContent.innerText = menuList;
-    } 
-    catch (error) {
-      console.error("Error fetching menu data:", error);
-    }
-  }
 
-    </script>
-  </body>
-</html>
+      function resetMap() {
+          map.setCenter(new kakao.maps.LatLng(37.5206, 126.9945));
+          map.setLevel(4);
+      }
+
+      async function markertype(type, markerIcon) {
+          try {
+              const coordinates = await getCoordinatesByType(type);
+              resetMap();
+              clearMarkers();
+              coordinates.forEach(store => {
+                  addMarker(store, markerIcon);
+              });
+          } catch (error) {
+              console.error("Error fetching store data:", error);
+          }
+      }
+
+      async function getDetail(store) {
+          modalTitle.textContent = store.name;
+          modalContent.textContent = `ID: ${store.id}\n타입: ${store.type}\n주소: (더미주소)\n상세 정보: (더미 정보)`;
+          modal.style.display = "block";
+          mapElement.classList.add("blur");
+      }
+  });
+</script> -->

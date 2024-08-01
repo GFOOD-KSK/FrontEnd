@@ -1,140 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kakao Map with Modal</title>
-    <style>
-      body {
-        display: flex;
-        justify-content: center; /* 수평 가운데 정렬 */
-        align-items: center; /* 수직 가운데 정렬 */
-        height: 100vh;
-        margin: 0;
-      }
-
-      .container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        height: 100%;
-        border: 1px solid #000;
-      }
-
-      section {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-      }
-
-      #name {
-        margin: 0;
-      }
-
-      p {
-        margin: 5px 0;
-      }
-
-      #site-header {
-        background-color: #cfe5d8d3;
-        height: 65px;
-        width: 500px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      #logo {
-        font-size: 2rem; /* 로고의 크기 */
-        font-weight: bold; /* 굵은 글씨 */
-        color: hsla(128, 85%, 47%, 0.233); /* 글씨 색상 */
-        text-transform: uppercase; /* 대문자로 변환 */
-        letter-spacing: 2px; /* 글자 사이 간격 */
-        background: linear-gradient(
-          45deg,
-          #539546,
-          #18d10b
-        ); /* 그라데이션 배경 */
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-        padding: 10px 20px;
-        text-align: center;
-      }
-
-      footer {
-        background-color: #cfe5d8d3;
-        padding: 10px 0;
-        text-align: center;
-        width: 100%;
-      }
-      footer ul {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-      }
-      footer li {
-        display: inline;
-        margin: 0 15px;
-      }
-      footer a {
-        text-decoration: none;
-        color: #333;
-      }
-      footer a:hover {
-        text-decoration: underline;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <header id="site-header">
-        <div id="logo">GFOOD</div>
-      </header>
-      <section>
-        <h2 id="name"></h2>
-        <p id="email"></p>
-        <p id="num"></p>
-        <p id="id"></p>
-      </section>
-      <footer>
-        <ul>
-          <li><a href="index.html" id="back">홈</a></li>
-          <li><a href="search.html" id="search">검색</a></li>
-          <li><a href="reservation.html" id="reservation">예약</a></li>
-          <li><a href="profile.html" id="profile">회원정보</a></li>
-        </ul>
-      </footer>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <title>Kakao Map with Modal</title>
+  <style>
+    /* 기존 CSS 스타일 */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+      border: 1px solid #000;
+    }
+    section {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    #name {
+      margin: 0;
+    }
+    p {
+      margin: 5px 0;
+    }
+    #site-header {
+      background-color: #cfe5d8d3;
+      height: 65px;
+      width: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #logo {
+      font-size: 2rem;
+      font-weight: bold;
+      color: hsla(128, 85%, 47%, 0.233);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: linear-gradient(45deg, #539546, #18d10b);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      padding: 10px 20px;
+      text-align: center;
+    }
+    footer {
+      background-color: #cfe5d8d3;
+      padding: 10px 0;
+      text-align: center;
+      width: 100%;
+    }
+    footer ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    footer li {
+      display: inline;
+      margin: 0 15px;
+    }
+    footer a {
+      text-decoration: none;
+      color: #333;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+    .logout-button {
+      margin-top: 20px; /* 버튼과 정보 사이 간격 */
+      padding: 10px 20px;
+      background-color: #ff4757;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .logout-button:hover {
+      background-color: #ff6b81;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    /* 모달 스타일 */
+    .modal {
+      display: none; /* 기본적으로 모달은 숨김 */
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 300px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header id="site-header">
+      <div id="logo">GFOOD</div>
+    </header>
+    <section>
+      <h2 id="name">***</h2>
+      <p id="email">***</p>
+      <p id="num">***</p>
+      <p id="id">***</p>
+      <button class="logout-button" onclick="logout()">로그아웃</button>
+    </section>
+    <footer>
+      <ul>
+        <li><a href="index.html" id="back"><span class="material-symbols-outlined">home</span>홈</a></li>
+        <li><a href="search.html" id="search"><span class="material-symbols-outlined">search</span>검색</a></li>
+        <li><a href="reservation.html" id="reservation"><span class="material-symbols-outlined">event</span>예약</a></li>
+        <li><a href="profile.html" id="profile"><span class="material-symbols-outlined">person</span>회원정보</a></li>
+      </ul>
+    </footer>
+  </div>
+  
+  <!-- 모달 추가 -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content">
+      <p>로그아웃을 하시겠습니까?</p>
+      <button id="confirmLogout">네</button>
+      <button id="cancelLogout">아니요</button>
     </div>
-    <script>
-      const userName = document.getElementById("name");
-      const userEmail = document.getElementById("email");
-      const userNum = document.getElementById("num");
-      const userId = document.getElementById("id");
-      const exUserId = 1;
+  </div>
 
-      fetch(`http://127.0.0.1:8002/users/${exUserId}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          userName.innerText = data[0].name;
-          userEmail.innerText = data[0].email;
-          userNum.innerText = data[0].phone;
-          userId.innerText = data[0].id;
-        })
-        .catch((error) => {
-          console.error(
-            "There has been a problem with your fetch operation:",
-            error
-          );
-        });
-    </script>
-  </body>
+  <!-- 카카오 SDK 추가 -->
+  <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+  <script>
+    // 카카오 SDK 초기화
+    Kakao.init('YOUR_APP_KEY'); // 여기에 실제 카카오 앱 키를 사용하세요
+
+    const userName = document.getElementById("name");
+    const userEmail = document.getElementById("email");
+    const userNum = document.getElementById("num");
+    const userId = document.getElementById("id");
+    const exUserId = 1;
+
+    fetch(`http://127.0.0.1:8002/users/${exUserId}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        userName.innerText = data[0].name || '***';
+        userEmail.innerText = data[0].email || '***';
+        userNum.innerText = data[0].phone || '***';
+        userId.innerText = data[0].id || '***';
+      })
+      .catch((error) => {
+        console.error("There has been a problem with your fetch operation:", error);
+      });
+
+    function logout() {
+      // 모달을 표시
+      document.getElementById("logoutModal").style.display = "block";
+    }
+
+    // 모달의 버튼 이벤트 처리
+    document.getElementById("confirmLogout").onclick = function() {
+      // 카카오 로그아웃
+      Kakao.Auth.logout(function() {
+        // 로그아웃 성공 시 start.html로 이동
+        window.location.href = 'start.html';
+      });
+    }
+
+    document.getElementById("cancelLogout").onclick = function() {
+      // "아니요"를 클릭하면 모달을 숨김
+      document.getElementById("logoutModal").style.display = "none";
+    }
+
+    // 모달 외부 클릭 시 모달 닫기
+    window.onclick = function(event) {
+      const modal = document.getElementById("logoutModal");
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+</body>
 </html>
+
