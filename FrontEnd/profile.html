@@ -147,12 +147,7 @@
     </div>
   </div>
 
-  <!-- 카카오 SDK 추가 -->
-  <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
   <script>
-    // 카카오 SDK 초기화
-    Kakao.init('YOUR_APP_KEY'); // 여기에 실제 카카오 앱 키를 사용하세요
-
     const userName = document.getElementById("name");
     const userEmail = document.getElementById("email");
     const userNum = document.getElementById("num");
@@ -183,16 +178,13 @@
 
     // 모달의 버튼 이벤트 처리
     document.getElementById("confirmLogout").onclick = function() {
-      // 카카오 로그아웃
-      Kakao.Auth.logout(function() {
-        // 로그아웃 성공 시 start.html로 이동
-        window.location.href = 'start.html';
-      });
+      // "네"를 클릭하면 start.html로 이동
+      window.location.href = 'start.html';
     }
 
     document.getElementById("cancelLogout").onclick = function() {
-      // "아니요"를 클릭하면 모달을 숨김
-      document.getElementById("logoutModal").style.display = "none";
+    // "아니요"를 클릭하면 모달을 숨김
+    document.getElementById("logoutModal").style.display = "none";
     }
 
     // 모달 외부 클릭 시 모달 닫기
@@ -205,4 +197,3 @@
   </script>
 </body>
 </html>
-
