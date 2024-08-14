@@ -1,133 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-  <title>Kakao Map with Modal</title>
-  <style>
-    /* 기존 CSS 스타일 */
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      height: 100%;
-      border: 1px solid #000;
-    }
-    section {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-    }
-    #name {
-      margin: 0;
-    }
-    p {
-      margin: 5px 0;
-    }
-    #site-header {
-      background-color: #cfe5d8d3;
-      height: 65px;
-      width: 500px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    #logo {
-      font-size: 2rem;
-      font-weight: bold;
-      color: hsla(128, 85%, 47%, 0.233);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      background: linear-gradient(45deg, #539546, #18d10b);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      padding: 10px 20px;
-      text-align: center;
-    }
-    footer {
-      background-color: #cfe5d8d3;
-      padding: 10px 0;
-      text-align: center;
-      width: 100%;
-    }
-    footer ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-    footer li {
-      display: inline;
-      margin: 0 15px;
-    }
-    footer a {
-      text-decoration: none;
-      color: #333;
-    }
-    footer a:hover {
-      text-decoration: underline;
-    }
-    .logout-button {
-      margin-top: 20px; /* 버튼과 정보 사이 간격 */
-      padding: 10px 20px;
-      background-color: #ff4757;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .logout-button:hover {
-      background-color: #ff6b81;
-    }
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-    /* 모달 스타일 */
-    .modal {
-      display: none; /* 기본적으로 모달은 숨김 */
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgb(0,0,0);
-      background-color: rgba(0,0,0,0.4);
-    }
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 300px;
-      text-align: center;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <title>GFOOD</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            overflow: hidden;
+        }
+
+        section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        #site-header {
+            background-color: #4caf50;
+            height: 65px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        footer {
+            background-color: #4caf50;
+            padding: 10px 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        footer ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        footer li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        footer a {
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .logout-button {
+            margin-top: 10px;
+            padding: 5px 20px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logout-button-tile {
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 20px 0;
+            height: 80px;
+            width: 120px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .logout-button-tile:hover {
+            background-color: #f30000;
+            transform: scale(1.05);
+        }
+
+        .logout-button-tile:active {
+            transform: scale(0.95);
+        }
+
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .profile-picture img {
+            width: 100%;
+            height: auto;
+        }
+
+        #name {
+            margin: 0;
+        }
+
+        .user-info {
+            width: 100%;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .user-info h3 {
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .user-info p {
+            margin: 0 0 10px 0;
+            font-size: 0.95rem;
+            color: #555;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-tile {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 20px 0;
+            height: 80px;
+            width: 120px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .button-tile:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        .button-tile:active {
+            transform: scale(0.95);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #modal-header {
+            background-color: #cfe5d8d3;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        #modal-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: hsla(128, 85%, 47%, 1);
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #539546, #18d10b);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 15px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .modal-buttons button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <header id="site-header">
-      <div id="logo">GFOOD</div>
-    </header>
-    <section>
-      <h2 id="name">***</h2>
-      <p id="email">***</p>
-      <p id="num">***</p>
-      <p id="id">***</p>
-      <button class="logout-button" onclick="logout()">로그아웃</button>
-    </section>
+    <div class="container">
+        <header id="site-header">
+            <div id="logo">GFOOD</div>
+        </header>
+        <section>
+            <div class="profile-container">
+                <div class="profile-picture">
+                    <img src="https://ifh.cc/g/2llcxn.png" alt="Profile Picture" />
+                </div>
+                <h2 id="name">김이박</h2>
+                <div class="user-info">
+                    <h3>이메일</h3>
+                    <p id="email">dnjsrhkdeo@wku.ac.kr</p>
+                    <h3>전화번호</h3>
+                    <p id="num">010-1234-5678</p>
+                    <h3>회원 고유 ID</h3>
+                    <p id="id">4654654</p>
+                </div>
+            </div>
+                <button class="logout-button" onclick="logout()">로그아웃</button>
+        </section>
     <footer>
       <ul>
         <li><a href="index.html" id="back"><span class="material-symbols-outlined">home</span>홈</a></li>
@@ -138,20 +291,26 @@
     </footer>
   </div>
   
-  <!-- 모달 추가 -->
-  <div id="logoutModal" class="modal">
-    <div class="modal-content">
-      <p>로그아웃을 하시겠습니까?</p>
+  
+<!-- 모달 추가 -->
+<div id="logoutModal" class="modal">
+  <div class="modal-content">
+    <div id="modal-header">
+      <div id="modal-logo">GFOOD</div>
+    </div>
+    <p>로그아웃을 하시겠습니까?</p>
+    <div class="modal-buttons">
       <button id="confirmLogout">네</button>
       <button id="cancelLogout">아니요</button>
     </div>
   </div>
+</div>
 
-  <!-- 카카오 SDK 추가 -->
+
   <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
   <script>
     // 카카오 SDK 초기화
-    Kakao.init('YOUR_APP_KEY'); // 여기에 실제 카카오 앱 키를 사용하세요
+    Kakao.init('0483db3a4bdedf858905037e9fe907c9');
 
     const userName = document.getElementById("name");
     const userEmail = document.getElementById("email");
@@ -159,7 +318,7 @@
     const userId = document.getElementById("id");
     const exUserId = 1;
 
-    fetch(`http://127.0.0.1:8002/users/${exUserId}`)
+    fetch(`http://localhost:8002/users/users/${exUserId}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -167,25 +326,21 @@
         return response.json();
       })
       .then((data) => {
-        userName.innerText = data[0].name || '***';
-        userEmail.innerText = data[0].email || '***';
-        userNum.innerText = data[0].phone || '***';
-        userId.innerText = data[0].id || '***';
+        userName.innerText = data[0].name || '이름';
+        userEmail.innerText = data[0].email || '이메일';
+        userNum.innerText = data[0].phone || '전화번호';
+        userId.innerText = data[0].id || 'id번호';
       })
       .catch((error) => {
         console.error("There has been a problem with your fetch operation:", error);
       });
 
     function logout() {
-      // 모달을 표시
       document.getElementById("logoutModal").style.display = "block";
     }
-
-    // 모달의 버튼 이벤트 처리
     document.getElementById("confirmLogout").onclick = function() {
       // 카카오 로그아웃
       Kakao.Auth.logout(function() {
-        // 로그아웃 성공 시 start.html로 이동
         window.location.href = 'start.html';
       });
     }

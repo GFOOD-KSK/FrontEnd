@@ -1,152 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kakao Map with Modal</title>
-    <!-- Google Material Icons 폰트 로드 -->
+    <title>GFOOD</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
-      body {
-        display: flex;
-        justify-content: center; /* 수평 가운데 정렬 */
-        align-items: center; /* 수직 가운데 정렬 */
-        height: 100vh;
-        margin: 0;
-      }
+         body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
 
-      .container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        height: 100%;
-        border: 1px solid #000;
-      }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            overflow: hidden;
+        }
 
-      section {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-      }
+        section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            overflow: hidden;
+        }
 
-      #site-header {
-        background-color: #cfe5d8d3;
-        height: 65px;
-        width: 500px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+        #site-header {
+            background-color: #4caf50;
+            height: 65px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-      #logo {
-        font-size: 2rem; /* 로고의 크기 */
-        font-weight: bold; /* 굵은 글씨 */
-        color: hsla(128, 85%, 47%, 0.233); /* 글씨 색상 */
-        text-transform: uppercase; /* 대문자로 변환 */
-        letter-spacing: 2px; /* 글자 사이 간격 */
-        background: linear-gradient(
-          45deg,
-          #539546,
-          #18d10b
-        ); /* 그라데이션 배경 */
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-        padding: 10px 20px;
-        text-align: center;
-      }
+        #logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
 
-      footer {
-        background-color: #cfe5d8d3;
-        padding: 10px 0;
-        text-align: center;
-        width: 100%;
-      }
-      footer ul {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-      }
-      footer li {
-        display: inline;
-        margin: 0 15px;
-      }
-      footer a {
-        text-decoration: none;
-        color: #333;
-      }
-      footer a:hover {
-        text-decoration: underline;
-      }
-      #search-container {
-        display: flex;
-        align-items: center;
-        border: 1px solid #ccc;
-        border-radius: 25px;
-        padding: 5px 10px;
-        width: 300px;
-        margin-top: 10px;
-      }
+        footer {
+            background-color: #4caf50;
+            padding: 10px 0;
+            text-align: center;
+            width: 100%;
+        }
 
-      #search-container input {
-        border: none;
-        outline: none;
-        flex-grow: 1;
-        padding: 5px;
-        border-radius: 25px;
-      }
+        footer ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
 
-      #search-container button {
-        background-color: #cfe5d8d3; /* Yellow background */
-        border: none;
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-      }
+        footer li {
+            display: inline;
+            margin: 0 15px;
+        }
 
-      #search-container button img {
-        width: 15px;
-        height: 15px;
-      }
+        footer a {
+            text-decoration: none;
+            color: #ffffff;
+        }
 
-      #search-container input::placeholder {
-        color: #aaa;
-      }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        #search-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            padding: 5px 10px;
+            width: 300px;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #search-container input {
+            border: none;
+            outline: none;
+            flex-grow: 1;
+            padding: 5px;
+            border-radius: 25px;
+            background: transparent;
+        }
+
+        #search-container button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        #search-container button img {
+            width: 20px;
+            height: 20px;
+        }
+
+        #search-container input::placeholder {
+            color: #aaa;
+        }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            flex-grow: 1;
+            overflow: hidden;
+            margin: 20px 0;
+            touch-action: pan-y; /* Enable vertical touch scrolling */
+        }
+
+        .slider-wrapper {
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            will-change: transform; /* Optimization for smoother transitions */
+        }
+
+        .store-container {
+            flex: 0 0 100%;
+            border: 1px solid #ddd;
+            margin: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background-color: #fff;
+            min-height: 300px; /* Set a minimum height for the store container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .store-header {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .store-header h3 {
+            margin: 0;
+        }
+
+        .menu-info {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .menu-info ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-info li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+            color: #555;
+        }
+
+        .menu-info li:last-child {
+            border-bottom: none;
+        }
+
+        .reserve-button {
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        .reserve-button:hover {
+            background-color: #45a049;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-body label {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .modal-body input,
+        .modal-body select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal-footer button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            background-color: #ddd;
+        }
+
+        .reserve-btn {
+            background-color: #4caf50;
+            color: #fff;
+        }
     </style>
-  </head>
-  <body>
-    <div class="container">
+</head>
+<body>
+  <div class="container">
       <header id="site-header">
-        <div id="logo">GFOOD</div>
+          <div id="logo">GFOOD</div>
       </header>
       <section>
-        <div id="search-container">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="음식 종류를 입력하세요"
-          />
-          <button id="searchButton">
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/1024px-Magnifying_glass_icon.svg.png"
-              alt="Search"
-              onclick="searchData()"
-            />
-          </button>
-        </div>
-        <hr />
-        <div>
-          <ul id="list"></ul>
-        </div>
+          <div id="search-container">
+              <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="음식 종류를 입력하세요"
+              />
+              <button id="searchButton" onclick="searchData()">
+                  <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/1024px-Magnifying_glass_icon.svg.png"
+                      alt="Search"
+                  />
+              </button>
+          </div>
+          <hr />
+          <div class="slider-container" id="sliderContainer">
+              <div class="slider-wrapper" id="sliderWrapper">
+                  <!-- 슬라이드 항목은 JavaScript에서 동적으로 추가됨 -->
+              </div>
+          </div>
       </section>
       <footer>
-        <footer>
           <ul>
               <li><a href="index.html" id="back"><span class="material-symbols-outlined">home</span>홈</a></li>
               <li><a href="search.html" id="search"><span class="material-symbols-outlined">search</span>검색</a></li>
@@ -154,39 +304,235 @@
               <li><a href="profile.html" id="profile"><span class="material-symbols-outlined">person</span>회원정보</a></li>
           </ul>
       </footer>
+  </div>
+  
+  <!-- 모달 HTML 구조 -->
+  <div id="reservationModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">예약하기</div>
+        <div class="modal-body">
+            <label for="reservationDate">예약 날짜</label>
+            <input type="date" id="reservationDate" />
+
+            <label for="reservationTime">예약 시간</label>
+            <select id="reservationTime">
+                <!-- JavaScript로 시간 옵션 추가 -->
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel-btn" onclick="closeModal()">취소</button>
+            <button class="reserve-btn" onclick="submitReservation()">예약</button>
+        </div>
     </div>
-    <script>
-      function searchData() {
-          const searchData = document.getElementById("searchInput").value;
-          const ulElement = document.getElementById("list");
-  
-          fetch(`http://127.0.0.1:8002/stores/${searchData}`)
-              .then((response) => {
-                  if (!response.ok) {
-                      throw new Error("Network response was not ok");
-                  }
-                  return response.json();
-              })
-              .then((data) => {
-                  ulElement.innerText = "";
-                  for (let i = 0; i < data.length; i++) {
-                      const newLiElement = document.createElement("li");
-                      newLiElement.innerText = `${data[i].store_name} ${data[i].name} ${data[i].price}\n`;
-                      ulElement.appendChild(newLiElement);
-                  }
-              })
-              .catch((error) => {
-                  console.error("There has been a problem with your fetch operation:", error);
-              });
+</div>
+</div>
+
+<script>
+  let currentSlide = 0;
+  let startY = 0;
+  let isDragging = false;
+  let initialTransform = 0;
+  const userId = getUserIdFromSession(); // 현재 로그인된 사용자의 ID를 세션 또는 쿠키에서 가져오는 함수
+  let selectedStoreName = ""; // 예약하려는 가게 이름 저장
+
+  function searchData() {
+      const foodType = document.getElementById("searchInput").value.trim();
+      const sliderWrapper = document.getElementById("sliderWrapper");
+
+      if (!foodType) {
+          sliderWrapper.innerHTML = "Please enter a food type.";
+          return;
       }
-  
-      // 엔터 키를 눌렀을 때 searchData 함수를 호출하도록 이벤트 리스너 추가
-      document.getElementById("searchInput").addEventListener("keydown", function (event) {
-          if (event.key === "Enter") {
-              searchData();
+
+      fetch(`http://127.0.0.1:8002/stores/stores/${foodType}`)
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error("Network response was not ok");
+              }
+              return response.json();
+          })
+          .then(data => {
+              console.log("Stores data:", data);
+              sliderWrapper.innerHTML = ""; // Clear previous results
+
+              if (data.length === 0) {
+                  sliderWrapper.innerHTML = "No stores found for the given food type.";
+                  return;
+              }
+
+              // Organize data by store_name
+              const storesMap = new Map();
+              data.forEach(item => {
+                  if (!storesMap.has(item.store_name)) {
+                      storesMap.set(item.store_name, []);
+                  }
+                  storesMap.get(item.store_name).push({ menu_name: item.menu_name, price: item.price });
+              });
+
+              // Create store containers
+              Array.from(storesMap.entries()).forEach(([storeName, menuItems]) => {
+                  const storeContainer = document.createElement("div");
+                  storeContainer.className = "store-container";
+
+                  const storeHeader = document.createElement("div");
+                  storeHeader.className = "store-header";
+                  storeHeader.innerHTML = `
+                      <h3>${storeName}</h3>
+                      <button class="reserve-button" onclick="makeReservation('${storeName}')">예약</button>
+                  `;
+
+                  const menuInfo = document.createElement("div");
+                  menuInfo.className = "menu-info";
+                  menuInfo.innerHTML = `
+                      <ul>
+                          ${menuItems.map(item => `<li>${item.menu_name}: ${item.price}원</li>`).join('')}
+                      </ul>
+                  `;
+
+                  storeContainer.appendChild(storeHeader);
+                  storeContainer.appendChild(menuInfo);
+                  sliderWrapper.appendChild(storeContainer);
+              });
+
+              updateSlidePosition();
+          })
+          .catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+              sliderWrapper.innerHTML = "An error occurred. Please try again.";
+          });
+  }
+
+  function openModal(storeName) {
+      selectedStoreName = storeName; // 선택된 가게 이름 저장
+      document.getElementById("reservationModal").style.display = "flex";
+
+      // 현재 시간 기준으로 시간 옵션 추가
+      const now = new Date();
+      const hours = now.getHours();
+
+      const reservationTimeSelect = document.getElementById("reservationTime");
+      reservationTimeSelect.innerHTML = ""; // 기존 옵션 초기화
+
+      for (let i = hours + 1; i <= 23; i++) { // 현재 시간보다 이후의 시간만 추가
+          const option = document.createElement("option");
+          option.value = `${i}:00`;
+          option.text = `${i}:00`;
+          reservationTimeSelect.add(option);
+      }
+  }
+
+  function closeModal() {
+      document.getElementById("reservationModal").style.display = "none";
+  }
+
+  function submitReservation() {
+      const reservationDate = document.getElementById("reservationDate").value;
+      const reservationTime = document.getElementById("reservationTime").value;
+
+      if (!reservationDate || !reservationTime) {
+          alert("날짜와 시간을 모두 선택해 주세요.");
+          return;
+      }
+
+      const reservationDatetime = `${reservationDate}T${reservationTime}:00`;
+
+      const reservationData = {
+          name: "John Doe",  // 여기서 실제 사용자 이름을 설정할 수 있습니다.
+          reservation_datetime: reservationDatetime,
+          store_name: selectedStoreName
+      };
+
+      fetch(`http://127.0.0.1:8002/users/users/${userId}/reservation`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(reservationData)
+      })
+      .then(response => {
+          if (!response.ok) {
+              throw new Error("Network response was not ok");
           }
+          return response.json();
+      })
+      .then(data => {
+          alert("예약이 성공적으로 추가되었습니다.");
+          closeModal();
+      })
+      .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
+          alert("예약에 실패했습니다. 다시 시도해주세요.");
       });
-  </script>
-  
-  </body>
+  }
+
+  function makeReservation(storeName) {
+      openModal(storeName);
+  }
+
+  function updateSlidePosition() {
+      const sliderWrapper = document.getElementById("sliderWrapper");
+      const slideHeight = sliderWrapper.children[0]?.offsetHeight || 0;
+      const offset = -currentSlide * slideHeight;
+      sliderWrapper.style.transform = `translateY(${offset}px)`;
+  }
+
+  // Handle dragging
+  document.getElementById("sliderWrapper").addEventListener('mousedown', (e) => {
+      startY = e.pageY;
+      isDragging = true;
+      initialTransform = parseFloat(getComputedStyle(document.getElementById("sliderWrapper")).transform.split(',')[5]) || 0;
+  });
+
+  document.getElementById("sliderWrapper").addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const moveY = e.pageY - startY;
+      const sliderWrapper = document.getElementById("sliderWrapper");
+      const newTransform = initialTransform + moveY;
+      sliderWrapper.style.transform = `translateY(${newTransform}px)`;
+  });
+
+  document.getElementById("sliderWrapper").addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      const sliderWrapper = document.getElementById("sliderWrapper");
+      const slideHeight = sliderWrapper.children[0]?.offsetHeight || 0;
+      const currentTransform = parseFloat(getComputedStyle(sliderWrapper).transform.split(',')[5]) || 0;
+      const newSlide = Math.round(-currentTransform / slideHeight);
+
+      // Constrain the slide index to be within bounds
+      currentSlide = Math.max(0, Math.min(newSlide, sliderWrapper.children.length - 1));
+      updateSlidePosition();
+  });
+
+  document.getElementById("sliderWrapper").addEventListener('mouseleave', () => {
+      isDragging = false;
+  });
+
+  // Handle mouse wheel scrolling
+  document.getElementById("sliderWrapper").addEventListener('wheel', (e) => {
+      const sliderWrapper = document.getElementById("sliderWrapper");
+      const slideHeight = sliderWrapper.children[0]?.offsetHeight || 0;
+
+      if (e.deltaY > 0) {
+          currentSlide = Math.min(currentSlide + 1, sliderWrapper.children.length - 1);
+      } else {
+          currentSlide = Math.max(currentSlide - 1, 0);
+      }
+
+      updateSlidePosition();
+      e.preventDefault();
+  });
+
+  document.getElementById("searchInput").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+          searchData();
+      }
+  });
+
+  function getUserIdFromSession() {
+      return 1;
+  }
+</script>
+
+</body>
 </html>
