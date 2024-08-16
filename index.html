@@ -395,7 +395,7 @@ footer a:hover {
         // 선택된 타입에 따른 좌표 데이터 가져오기
         async function getCoordinatesByType(type) {
           try {
-            const response = await fetch(`http://localhost:8002/stores/stores?business_type=${type}`);
+            const response = await fetch(`http://localhost:8002/stores?business_type=${type}`);
             if (!response.ok) {
               throw new Error('Network response was not ok');
             }
@@ -474,11 +474,11 @@ footer a:hover {
             clearMarkers(); // 이전 마커 제거
             coordinates.forEach(coord => {
               const store = {
-                x_coordinate: coord.lat,
-                y_coordinate: coord.lng,
+                x_coordinate: coord.x_coordinate,
+                y_coordinate: coord.y_coordinate,
                 name: coord.name,
-                type: coord.type,
-                id: coord.id // 추가된 id 필드
+                type: coord.business_type,
+                id: coord.idx // 추가된 id 필드
               };
               addMarker(store, markerIcon); // 마커 추가
             });
