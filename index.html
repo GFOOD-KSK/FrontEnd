@@ -279,6 +279,7 @@ footer {
   padding: 10px 0;
   text-align: center;
   width: 100%;
+  
 }
 
 footer ul {
@@ -395,7 +396,12 @@ footer a:hover {
         // 선택된 타입에 따른 좌표 데이터 가져오기
         async function getCoordinatesByType(type) {
           try {
-            const response = await fetch(`http://localhost:8002/stores?business_type=${type}`);
+            // 현재 맵 범위 좌표 받아오기
+            var bounds = map.getBounds()
+            var sw = bounds.getSouthWest(); // 남서쪽 좌표
+            var ne = bounds.getNorthEast(); // 북동쪽 좌표
+            const response = await fetch(`http://localhost:8002/stores?neLng=${ne.La}&neLat=${ne.Ma}&swLng=${sw.La}&swLat=${sw.Ma}&business_type=${type}`);
+
             if (!response.ok) {
               throw new Error('Network response was not ok');
             }
