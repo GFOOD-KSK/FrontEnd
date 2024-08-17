@@ -94,34 +94,49 @@
             <div class="event-title open-sw-title">오픈SW 개발자 대회</div>
             <div class="event-title gfood-title">GFOOD 프로젝트</div>
         </header>
-       
-        <button id="kakao-login-btn">카카오 로그인</button>
-        <div>_______________________________________</div>
-        <li><a href="index.html" id="back">home</span>임시 로그인</a></li>
-    </div>
+        <form id="signup-form">
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" required><br><br>
 
+            <label for="nickname"> 닉네임</label>
+            <input type="nickname" id="nickname" name="nickname" required><br><br>
+
+            <label for="call"> 전화번호</label>
+            <input type="call" id="call" name="call" required><br><br>
+            <button type="submit">회원가입</button>
+
+        </form>
+       
+    </div>
     <script>
-        document.getElementById('kakao-login-btn').onclick = function() {
-            const APIKEY="cde0cad67453d3b9fb93961a730ab660"
-            window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${APIKEY}&redirect_uri=http://127.0.0.1:8002/auth/kakao/callback&response_type=code`;
-            /*
-            Kakao.Auth.authorize({
-                redirectUri: 'http://127.0.0.1:8002/auth/kakao/callback&response_type=code',
-                success: function(authObj) {
-                    console.log(authObj);
-                    initInputs();
-                    window.location.href = 'index.html';
+        document.getElementById('signup-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const urlParams = new URLSearchParams(window.location.search)
+            const data = {
+                email: formData.get('email'),
+                name: formData.get('nickname'),
+                call: formData.get('call'),
+                kakao_id: urlParams.get('kakao_id')
+            };
+            console.log(data)
+
+            fetch('http://localhost:8002/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                fail: function(err) {
-                    alert(JSON.stringify(err));
-                }
-            });
-            */
-        };
-        
-        document.addEventListener('DOMContentLoaded', (event) => {
-            document.getElementById('user-id').addEventListener('keydown', handleEnterPress);
-            document.getElementById('user-password').addEventListener('keydown', handleEnterPress);
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert('회원가입이 완료되었습니다. 홈 페이지로 이동합니다.');
+                window.location.href = '/start.html';
+            })
+            .catch(error => {
+                alert('회원가입에 실패했습니다: ');
+            });   
         });
     </script>
 </body>

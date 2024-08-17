@@ -173,9 +173,9 @@
     <script>
       const userId = getUserIdFromSession();
       fetchReservations(userId);
-      function getUserIdFromSession() {
+      function getUserIdFromSession() {  //TODO
         // 로그인 후 사용자 id가져오기 필요
-        return 1;
+        return window.name
       }
 
       function fetchReservations(userId) {
