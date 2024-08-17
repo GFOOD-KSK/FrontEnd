@@ -328,7 +328,6 @@ footer a:hover {
   <div class="modal_popup">
     <div class="header">
       <h3 id="modalTitle">가게 이름</h3>
-      <span id="storeCategory">한식</span>
 
     </div>
     <div class="button_below_title">
@@ -508,7 +507,6 @@ footer a:hover {
                 const menuList = menuItems.map(item => `<li>${item.menu_name}</li>`).join("");
 
                 modalContent.innerHTML = `
-                  <p>타입: ${firstItem.food_type}</p>
                   <ul>${menuList}</ul>
                 `; // 모달 내용 설정
             } else {
@@ -520,8 +518,8 @@ footer a:hover {
             mapElement.classList.add("blur"); // 지도 블러 처리
         } catch (error) {
             console.error("Error fetching store detail:", error);
-            modalTitle.textContent = "정보 불러오기 실패";
-            modalContent.innerHTML = "상점 정보를 불러오는 데 실패했습니다.";
+            modalTitle.textContent = `${store.name}`;
+            modalContent.innerHTML = "메뉴가 제공되지 않습니다.";
         }
     }
 });
