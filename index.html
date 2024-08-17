@@ -127,7 +127,7 @@ section {
 .modal {
   display: none;  /* 모달을 기본적으로 숨깁니다. */
   position: fixed;
-  z-index: 1;
+  z-index: 1000;  /* 모달을 지도 위로 올림 */
   left: 0;
   top: 0;
   width: 100%;
@@ -153,6 +153,7 @@ section {
   display: flex;
   flex-direction: column;
   align-items: flex-start;  /* 왼쪽 정렬 */
+  z-index: 1001;  /* 모달 팝업을 모달 배경 위로 올림 */
 }
 
 /* 헤더 스타일 */
@@ -309,6 +310,10 @@ footer a:hover {
     'GRAD' 0,
     'opsz' 24;
 }
+.blur {
+    filter: blur(5px);
+}
+
 
     </style>
     <script
@@ -324,11 +329,10 @@ footer a:hover {
     <div class="header">
       <h3 id="modalTitle">가게 이름</h3>
       <span id="storeCategory">한식</span>
-      <div id="storeTypeCircle">음식점</div>
+
     </div>
     <div class="button_below_title">
       <a href="reservation.html" class="reserve_page_btn">예약하기</a>
-      <a href="navigation.html" class="direction_page_btn">길찾기</a>
     </div>
     <span id="modalContent">여기에 가게에 대한 상세 설명이 들어갑니다.</span>
     <ul class="menu_list" id="menuList">
@@ -363,168 +367,166 @@ footer a:hover {
     </div>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        const modal = document.querySelector(".modal");
-        const modalClose = document.querySelector(".close_btn");
-        const mapElement = document.getElementById("map");
-        const modalTitle = document.getElementById("modalTitle");
-        const modalContent = document.getElementById("modalContent");
-    
-        // 모달 닫기 버튼 클릭 시 모달 숨기기 및 지도 블러 제거
-        modalClose.addEventListener("click", function () {
-          modal.style.display = "none";
-          mapElement.classList.remove("blur");
-        });
-    
-        // 모달 외부 클릭 시 모달 숨기기
-        window.addEventListener("click", function (event) {
-          if (event.target === modal) {
+    const modal = document.querySelector(".modal");
+    const modalClose = document.querySelector(".close_btn");
+    const mapElement = document.getElementById("map");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalContent = document.getElementById("modalContent");
+
+    // 모달 닫기 버튼 클릭 시 모달 숨기기 및 지도 블러 제거
+    modalClose.addEventListener("click", function () {
+        modal.style.display = "none";
+        mapElement.classList.remove("blur");
+    });
+
+    // 모달 외부 클릭 시 모달 숨기기
+    window.addEventListener("click", function (event) {
+        if (event.target === modal) {
             modal.style.display = "none";
             mapElement.classList.remove("blur");
-          }
-        });
-    
-        const mapOption = {
-          center: new kakao.maps.LatLng(37.5206, 126.9945),
-          level: 4
-        };
-    
-        const map = new kakao.maps.Map(mapElement, mapOption);
-        let markers = []; // 마커 배열
-        let currentOverlay = null; // 현재 오버레이 저장 변수
-        let currentType = null; // 현재 선택된 타입 저장 변수
-    
-        // 선택된 타입에 따른 좌표 데이터 가져오기
-        async function getCoordinatesByType(type) {
-          try {
-            // 현재 맵 범위 좌표 받아오기
-            var bounds = map.getBounds()
+        }
+    });
+
+    const mapOption = {
+        center: new kakao.maps.LatLng(37.5206, 126.9945),
+        level: 4
+    };
+
+    const map = new kakao.maps.Map(mapElement, mapOption);
+    let markers = []; // 마커 배열
+    let currentOverlay = null; // 현재 오버레이 저장 변수
+    let currentType = null; // 현재 선택된 타입 저장 변수
+
+    // 선택된 타입에 따른 좌표 데이터 가져오기
+    async function getCoordinatesByType(type) {
+        try {
+            var bounds = map.getBounds();
             var sw = bounds.getSouthWest(); // 남서쪽 좌표
             var ne = bounds.getNorthEast(); // 북동쪽 좌표
             const response = await fetch(`http://localhost:8002/stores?neLng=${ne.La}&neLat=${ne.Ma}&swLng=${sw.La}&swLat=${sw.Ma}&business_type=${type}`);
 
             if (!response.ok) {
-              throw new Error('Network response was not ok');
+                throw new Error('Network response was not ok');
             }
             const coordinates = await response.json();
             return coordinates; // 좌표 반환
-          } catch (error) {
+        } catch (error) {
             console.error("Error fetching coordinates data:", error);
             alert("상점 데이터를 불러오는 데 실패했습니다. 나중에 다시 시도해 주세요.");
             return []; // 빈 배열 반환
-          }
         }
-    
-        // 버튼 클릭 시 마커 추가
-        document.querySelectorAll(".header-button").forEach(button => {
-          button.addEventListener("click", async function () {
+    }
+
+    // 버튼 클릭 시 마커 추가
+    document.querySelectorAll(".header-button").forEach(button => {
+        button.addEventListener("click", async function () {
             const type = this.getAttribute("data-type");
             const markerIcon = this.getAttribute("data-icon");
             await markertype(type, markerIcon); // 마커 타입에 따라 마커 추가
-          });
         });
-    
-        // 마커 추가 함수
-        function addMarker(store, markerIcon) {
-          const pos = new kakao.maps.LatLng(store.x_coordinate, store.y_coordinate);
-          const imageSize = new kakao.maps.Size(94, 99);
-          const imageOption = { offset: new kakao.maps.Point(44, 79) };
-          const markerImage = new kakao.maps.MarkerImage(markerIcon, imageSize, imageOption);
-          const marker = new kakao.maps.Marker({
+    });
+
+    // 마커 추가 함수
+    function addMarker(store, markerIcon) {
+        const pos = new kakao.maps.LatLng(store.x_coordinate, store.y_coordinate);
+        const imageSize = new kakao.maps.Size(94, 99);
+        const imageOption = { offset: new kakao.maps.Point(44, 79) };
+        const markerImage = new kakao.maps.MarkerImage(markerIcon, imageSize, imageOption);
+        const marker = new kakao.maps.Marker({
             map: map,
             position: pos,
             image: markerImage
-          });
-            console.log(store)
-          // 마커 클릭 시 오버레이 표시
-          kakao.maps.event.addListener(marker, "click", function () {
+        });
+
+        kakao.maps.event.addListener(marker, "click", function () {
             if (currentOverlay) {
-              currentOverlay.setMap(null); // 이전 오버레이 제거
+                currentOverlay.setMap(null); // 이전 오버레이 제거
             }
-    
+
             const overlayContent = document.createElement("div");
             overlayContent.innerHTML = `<div class="overlay-content">
                 <h3>${store.name}</h3>
                 <span>${store.type}</span>
             </div>`;
+            
             overlayContent.querySelector(".overlay-content").onclick = function () {
-              getDetail(store); // 상세 정보 보기
+                getDetail(store); // 상세 정보 보기
+                modal.style.display = "block"; // 모달 표시
+                mapElement.classList.add("blur"); // 지도 블러 처리
             };
             const overlay = new kakao.maps.CustomOverlay({
-              position: pos,
-              content: overlayContent,
+                position: pos,
+                content: overlayContent,
             });
-    
+
             currentOverlay = overlay; // 현재 오버레이 업데이트
             overlay.setMap(map); // 오버레이 지도에 표시
-          });
-          markers.push({ store, marker }); // 마커 배열에 저장
-        }
-    
-        // 모든 마커 제거 함수
-        function clearMarkers() {
-          markers.forEach(({ marker }) => marker.setMap(null)); // 지도에서 마커 제거
-          markers = []; // 마커 배열 초기화
-        }
-    
-        // 지도를 초기화하는 함수
-        function resetMap() {
-          map.setCenter(new kakao.maps.LatLng(37.5206, 126.9945)); // 지도 중심 설정
-          map.setLevel(4); // 지도 레벨 설정
-        }
-    
-        // 마커 타입에 따라 좌표 데이터 가져오기
-        async function markertype(type, markerIcon) {
-          try {
+        });
+        markers.push({ store, marker }); // 마커 배열에 저장
+    }
+
+    // 모든 마커 제거 함수
+    function clearMarkers() {
+        markers.forEach(({ marker }) => marker.setMap(null)); // 지도에서 마커 제거
+        markers = []; // 마커 배열 초기화
+    }
+
+    // 마커 타입에 따라 좌표 데이터 가져오기
+    async function markertype(type, markerIcon) {
+        try {
             const coordinates = await getCoordinatesByType(type);
-            // resetMap(); // 지도를 초기화
             clearMarkers(); // 이전 마커 제거
             coordinates.forEach(coord => {
-              const store = {
-                x_coordinate: coord.x_coordinate,
-                y_coordinate: coord.y_coordinate,
-                name: coord.name,
-                type: coord.business_type,
-                id: coord.idx // 추가된 id 필드
-              };
-              addMarker(store, markerIcon); // 마커 추가
+                const store = {
+                    x_coordinate: coord.x_coordinate,
+                    y_coordinate: coord.y_coordinate,
+                    name: coord.name,
+                    type: coord.business_type,
+                    id: coord.idx // 추가된 id 필드
+                };
+                addMarker(store, markerIcon); // 마커 추가
             });
-          } catch (error) {
+        } catch (error) {
             console.error("Error fetching store data:", error);
-          }
         }
-    
-        // 상세 정보 가져오기
-        async function getDetail(store) {
-          try {
-            const [detailResponse, menuResponse] = await Promise.all([
-              fetch(`http://localhost:8002/stores/stores/${store.id}`),
-              fetch(`http://localhost:8002/stores/stores/${store.id}/menu`)
-            ]);
-    
-            if (!detailResponse.ok || !menuResponse.ok) {
-              throw new Error('Network response was not ok');
+    }
+
+    // 상세 정보 가져오기
+    async function getDetail(store) {
+        try {
+            const response = await fetch(`http://localhost:8002/stores/${store.id}/menu`);
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
-    
-            const detail = await detailResponse.json();
-            const menuItems = await menuResponse.json();
-    
-            const menuList = menuItems.map(item => `<li>${item.name} - ${item.price}원</li>`).join("");
-    
-            modalTitle.textContent = detail.name;
-            modalContent.innerHTML = `
-              <p>타입: ${detail.type}</p>
-              <p>주소: ${detail.address}</p>
-              <p>상세 정보: ${detail.description}</p>
-              <ul>${menuList}</ul>
-            `; // 모달 내용 설정
-    
+            const menuItems = await response.json();
+
+            // 첫 번째 메뉴 항목에서 store_name을 가져와 제목 설정
+            if (menuItems.length > 0) {
+                const firstItem = menuItems[0];
+                modalTitle.textContent = firstItem.store_name;
+                const menuList = menuItems.map(item => `<li>${item.menu_name}</li>`).join("");
+
+                modalContent.innerHTML = `
+                  <p>타입: ${firstItem.food_type}</p>
+                  <ul>${menuList}</ul>
+                `; // 모달 내용 설정
+            } else {
+                modalTitle.textContent = "정보 없음";
+                modalContent.innerHTML = "해당 가게의 메뉴 정보가 없습니다.";
+            }
+
             modal.style.display = "block"; // 모달 표시
             mapElement.classList.add("blur"); // 지도 블러 처리
-          } catch (error) {
+        } catch (error) {
             console.error("Error fetching store detail:", error);
-          }
+            modalTitle.textContent = "정보 불러오기 실패";
+            modalContent.innerHTML = "상점 정보를 불러오는 데 실패했습니다.";
         }
-      });
+    }
+});
+
+
     </script>
     
 </body>
