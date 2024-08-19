@@ -525,6 +525,10 @@ footer a:hover {
 });
 
 
+      window.onload = function(){
+        const urlParams = new URLSearchParams(window.location.search)
+        window.name =urlParams.get("user_id")
+      }
     </script>
     
 </body>
