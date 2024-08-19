@@ -318,7 +318,7 @@ footer a:hover {
     </style>
     <script
       type="text/javascript"
-      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0483db3a4bdedf858905037e9fe907c9"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0483db3a4bdedf858905037e9fe907c9&libraries=clusterer"
     ></script>
   </head>
 
@@ -393,6 +393,11 @@ footer a:hover {
 
     const map = new kakao.maps.Map(mapElement, mapOption);
     let markers = []; // 마커 배열
+    let clusterer = new kakao.maps.MarkerClusterer({
+      map: map,
+      averageCenter: true,
+      minLevel: 10
+    })
     let currentOverlay = null; // 현재 오버레이 저장 변수
     let currentType = null; // 현재 선택된 타입 저장 변수
 
@@ -468,6 +473,7 @@ footer a:hover {
     function clearMarkers() {
         markers.forEach(({ marker }) => marker.setMap(null)); // 지도에서 마커 제거
         markers = []; // 마커 배열 초기화
+        clusterer.clear()
     }
 
     // 마커 타입에 따라 좌표 데이터 가져오기
@@ -485,6 +491,11 @@ footer a:hover {
                 };
                 addMarker(store, markerIcon); // 마커 추가
             });
+            const res = []
+            markers.forEach((marker, i)=>{
+              res.push(marker.marker)
+            })
+            clusterer.addMarkers(res)
         } catch (error) {
             console.error("Error fetching store data:", error);
         }
