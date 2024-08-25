@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GFOOD Reservation</title>
+    <!-- Google Material Icons 폰트 로드 -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: #4caf50;
+            height: 65px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 0 auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="date"], select {
+            width: calc(100% - 24px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .store-info {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        .submit-btn, .cancel-btn {
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        .cancel-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background-color: #da190b;
+        }
+
+        footer {
+            background-color: #4caf50;
+            padding: 10px 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        footer ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        footer li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        footer a {
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        #map {
+            width: 520px;
+            height: 100%;
+            filter: none;
+            margin: 0 auto;
+            transition: filter 0.2s;
+        }
+    </style>
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0483db3a4bdedf858905037e9fe907c9&libraries=clusterer"></script>
+</head>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div id="logo">GFOOD</div>
+        </header>
+        <section>
+            <div class="form-container">
+                <h2>예약하기</h2>
+                <div id="store-info" class="store-info">
+                    <!-- 가게 정보가 여기에 표시됩니다 -->
+                </div>
+                <form id="reservationForm">
+                    <input type="hidden" id="store_id" name="store_id">
+                    <input type="hidden" id="store_name" name="store_name">
+                    <input type="hidden" id="store_type" name="store_type">
+
+                    <label for="visit_date">방문 날짜:</label>
+                    <input type="date" id="visit_date" name="visit_date" required>
+
+                    <label for="visit_time">방문 시간:</label>
+                    <select id="visit_time" name="visit_time" required>
+                        <!-- 시간 옵션이 여기 추가됩니다 -->
+                    </select>
+
+                    <div class="button-container">
+                        <button type="submit" class="submit-btn">예약하기</button>
+                        <button type="button" class="cancel-btn" onclick="window.location.href='index.html'">취소</button>
+                    </div>
+                    
+                </form>
+            </div>
+            <div id="map"></div>
+        </section>
+
+        <footer>
+            <ul>
+                <li>
+                    <a href="index.html" id="back">
+                        <span class="material-symbols-outlined">home</span>홈
+                    </a>
+                </li>
+                <li>
+                    <a href="search.html" id="search">
+                        <span class="material-symbols-outlined">search</span>검색
+                    </a>
+                </li>
+                <li>
+                    <a href="reservation.html" id="reservation">
+                        <span class="material-symbols-outlined">event</span>예약
+                    </a>
+                </li>
+                <li>
+                    <a href="profile.html" id="profile">
+                        <span class="material-symbols-outlined">person</span>회원정보
+                    </a>
+                </li>
+            </ul>
+        </footer>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const storeId = urlParams.get("store_id");
+            const storeName = urlParams.get("store_name");
+            const storeType = urlParams.get("store_type");
+            const storeLat = parseFloat(urlParams.get("latitude")); // 좌표에서 위도
+            const storeLng = parseFloat(urlParams.get("longitude")); // 좌표에서 경도
+
+            const storeTypeMap = {
+                'a': '한식', 'b': '중식', 'c': '일식', 'd': '양식',
+                'e': '패스트푸드', 'f': '일반대중음식', 'g': '편의점', 'h': '제과점'
+            };
+
+            document.getElementById("store_id").value = storeId;
+            document.getElementById("store_name").value = storeName;
+            document.getElementById("store_type").value = storeType;
+
+            const storeTypeText = storeTypeMap[storeType] || '알 수 없음';
+            const storeInfoDiv = document.getElementById("store-info");
+            storeInfoDiv.innerHTML = `
+                <p><strong>가게 이름:</strong> ${storeName}</p>
+                <p><strong>가게 종류:</strong> ${storeTypeText}</p>
+            `;
+
+            function updateTimeOptions() {
+                const visitTimeSelect = document.getElementById("visit_time");
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinutes = now.getMinutes();
+
+                visitTimeSelect.innerHTML = "";
+
+                for (let hour = 0; hour < 24; hour++) {
+                    for (let minutes = 0; minutes < 60; minutes += 30) {
+                        const hourString = hour.toString().padStart(2, '0');
+                        const minuteString = minutes.toString().padStart(2, '0');
+                        const timeString = `${hourString}:${minuteString}`;
+
+                        const option = document.createElement("option");
+                        option.value = timeString;
+                        option.text = timeString;
+
+                        if (hour > currentHour || (hour === currentHour && minutes >= Math.ceil(currentMinutes / 30) * 30)) {
+                            visitTimeSelect.add(option);
+                        }
+                    }
+                }
+            }
+
+            updateTimeOptions();
+
+            document.getElementById("reservationForm").addEventListener("submit", async function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+                const reservationDate = formData.get("visit_date");
+                const reservationTime = formData.get("visit_time");
+                const reservationDatetime = `${reservationDate}T${reservationTime}:00`;
+
+                try {
+                    const response = await fetch(`http://localhost:8002/users/users/${getUserIdFromSession()}/reservation`, {
+                        method: "POST",
+                        body: JSON.stringify({
+                            store_name: formData.get("store_name"),
+                            reservation_datetime: reservationDatetime
+                        }),
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("예약 요청 실패");
+                    }
+
+                    alert("예약이 성공적으로 완료되었습니다!");
+                    window.location.href = "reservation.html";
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("예약 중 오류가 발생했습니다. 다시 시도해 주세요.");
+                }
+            });
+
+            function getUserIdFromSession() {
+                // 세션에서 현재 로그인된 사용자의 ID를 반환하는 함수
+                return window.name;
+            }
+
+            function initMap() {
+                const storeLocation = new kakao.maps.LatLng(storeLat, storeLng);
+                const map = new kakao.maps.Map(document.getElementById('map'), {
+                    center: storeLocation, // 초기 중심 좌표를 가게 위치로 설정
+                    level: 6 // 줌 레벨 조정
+                });
+
+                // 목표 위치 마커
+                const storeMarker = new kakao.maps.Marker({
+                    map: map,
+                    position: storeLocation,
+                    title: storeName
+                });
+
+                // 현재 위치 마커
+                const userLocationMarker = new kakao.maps.Marker({
+                    map: map,
+                    position: storeLocation, // 초기 위치는 가게 위치와 동일
+                    title: '현재 위치',
+                    icon: {
+                        content: '<div style="color:blue;">현재 위치</div>'
+                    }
+                });
+
+                function getCurrentLocation() {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.watchPosition(function(position) {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            const currentLatLng = new kakao.maps.LatLng(lat, lng);
+
+                            // 현재 위치 마커 업데이트
+                            userLocationMarker.setPosition(currentLatLng);
+                        }, function() {
+                            alert("현재 위치를 가져올 수 없습니다.");
+                        });
+                    } else {
+                        alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+                    }
+                }
+
+                // 지도 로딩 시 현재 위치 가져오기
+                getCurrentLocation();
+            }
+
+            initMap();
+        });
+    </script>
+    </body>
+</html>
+
