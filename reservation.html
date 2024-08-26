@@ -173,13 +173,14 @@
     <script>
       const userId = getUserIdFromSession();
       fetchReservations(userId);
-      function getUserIdFromSession() {  //TODO
-        // 로그인 후 사용자 id가져오기 필요
-        return window.name
+    
+      function getUserIdFromSession() {
+        // 로그인 후 사용자 id 가져오기 필요
+        return window.name; // 예시로 세션에서 userId를 가져오는 부분
       }
-
+    
       function fetchReservations(userId) {
-        fetch(`http://localhost:8002/users/${userId}/reservation`) // 사용자 ID 확인
+        fetch(`http://localhost:8002/users/${userId}/reservation`)
           .then((response) => {
             if (!response.ok) {
               throw new Error("Network response was not ok");
@@ -187,41 +188,46 @@
             return response.json();
           })
           .then((data) => {
-            const reservationSection =
-              document.getElementById("reservationSection");
+            const reservationSection = document.getElementById("reservationSection");
             const now = new Date();
-
+    
+            // 예약을 시간순으로 내림차순 정렬
+            data.sort((a, b) => new Date(b.reservation_at) - new Date(a.reservation_at));
+    
+            // Clear previous reservations
+            reservationSection.innerHTML = '';
+    
             data.forEach((reservation) => {
               const reservationBox = document.createElement("div");
               reservationBox.className = "reservation-box";
-
-              const reservationDate = new Date(
-                reservation.reservation_datetime
-              );
-
+    
+              const reservationDate = new Date(reservation.reservation_at);
+    
               // 예약 시간을 표시
               const dateTimeSpan = document.createElement("span");
               dateTimeSpan.className = "datetime";
+              dateTimeSpan.textContent = reservationDate.toLocaleString();
+    
+              // 예약이 과거인지 미래인지에 따라 스타일 적용
               if (reservationDate < now) {
-                dateTimeSpan.textContent = "Time Out";
                 reservationBox.classList.add("past-reservation");
               } else {
-                dateTimeSpan.textContent = reservation.reservation_datetime;
                 reservationBox.classList.add("upcoming-reservation");
               }
-
+    
               // 상점 이름을 표시
               const storeSpan = document.createElement("span");
               storeSpan.className = "store";
               storeSpan.textContent = reservation.store_name;
-
-              // 예약 취소
+    
+              // 예약 취소 버튼 추가
               const cancelButton = document.createElement("button");
               cancelButton.className = "cancel-button";
               cancelButton.textContent = "예약 취소";
               cancelButton.onclick = function () {
-                cancelReservation(reservation.reservation_id);
+                cancelReservation(userId, reservation.reservation_id, reservationBox);
               };
+    
               reservationBox.appendChild(storeSpan);
               reservationBox.appendChild(dateTimeSpan);
               reservationBox.appendChild(cancelButton);
@@ -229,34 +235,33 @@
             });
           })
           .catch((error) => {
-            console.error(
-              "There was a problem with the fetch operation:",
-              error
-            );
+            console.error("There was a problem with the fetch operation:", error);
           });
       }
-
-      function cancelReservation(reservationId) {
+    
+      function cancelReservation(userId, reservationId, reservationBox) {
         if (confirm("정말로 이 예약을 취소하시겠습니까?")) {
-          fetch(`http://localhost:8002/reservations/${reservationId}`, {
+          fetch(`http://localhost:8002/users/${userId}/reservation`, {
             method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ reservation_id: reservationId }), // 삭제할 예약 ID 전송
           })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error("Network response was not ok");
-              }
-              alert("예약이 취소되었습니다.");
-              window.location.reload(); // 예약 취소 후 페이지를 새로고침하여 목록을 갱신
-            })
-            .catch((error) => {
-              console.error(
-                "There was a problem with the delete operation:",
-                error
-              );
-              alert("예약 취소 중 문제가 발생했습니다.");
-            });
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            // 예약 취소 성공
+            alert("예약이 취소되었습니다.");
+            reservationBox.remove(); // DOM에서 예약 항목 제거
+          })
+          .catch((error) => {
+            console.error("There was a problem with the delete operation:", error);
+            alert("예약 취소 중 문제가 발생했습니다.");
+          });
         }
       }
     </script>
-  </body>
+    </body>
 </html>
