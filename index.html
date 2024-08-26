@@ -548,10 +548,17 @@ footer a:hover {
     }
 });
 
-window.onload = function(){
+window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
-    window.name = urlParams.get("user_id");
+    const newUserId = urlParams.get("user_id");
+
+    if (newUserId !== null && newUserId !== "") {
+        window.name = newUserId;
+    } else if (!window.name) {
+        window.name = "1";
+    }
 };
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const buttons = document.querySelectorAll(".header-button");

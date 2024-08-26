@@ -331,7 +331,7 @@
       const userEmail = document.getElementById("email");
       const userNum = document.getElementById("num");
       const userId = document.getElementById("id");
-      const exUserId = 1;
+      const exUserId = window.name;
 
       fetch(`http://localhost:8002/users/${exUserId}`)
         .then((response) => {

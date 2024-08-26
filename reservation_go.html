@@ -75,6 +75,13 @@
             font-size: 1.5rem;
         }
 
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            color: #333;
+        }
+
         label {
             display: block;
             margin-bottom: 5px;
@@ -169,7 +176,6 @@
     </style>
     <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0483db3a4bdedf858905037e9fe907c9&libraries=clusterer"></script>
 </head>
-</head>
 <body>
     <div class="container">
         <header>
@@ -178,6 +184,9 @@
         <section>
             <div class="form-container">
                 <h2>예약하기</h2>
+                <div id="user-info" class="user-info">
+                    <!-- 유저 정보가 여기에 표시됩니다 -->
+                </div>
                 <div id="store-info" class="store-info">
                     <!-- 가게 정보가 여기에 표시됩니다 -->
                 </div>
@@ -231,140 +240,141 @@
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const storeId = urlParams.get("store_id");
-            const storeName = urlParams.get("store_name");
-            const storeType = urlParams.get("store_type");
-            const storeLat = parseFloat(urlParams.get("latitude")); // 좌표에서 위도
-            const storeLng = parseFloat(urlParams.get("longitude")); // 좌표에서 경도
-
-            const storeTypeMap = {
-                'a': '한식', 'b': '중식', 'c': '일식', 'd': '양식',
-                'e': '패스트푸드', 'f': '일반대중음식', 'g': '편의점', 'h': '제과점'
-            };
-
-            document.getElementById("store_id").value = storeId;
-            document.getElementById("store_name").value = storeName;
-            document.getElementById("store_type").value = storeType;
-
-            const storeTypeText = storeTypeMap[storeType] || '알 수 없음';
-            const storeInfoDiv = document.getElementById("store-info");
-            storeInfoDiv.innerHTML = `
-                <p><strong>가게 이름:</strong> ${storeName}</p>
-                <p><strong>가게 종류:</strong> ${storeTypeText}</p>
-            `;
-
-            function updateTimeOptions() {
-                const visitTimeSelect = document.getElementById("visit_time");
-                const now = new Date();
-                const currentHour = now.getHours();
-                const currentMinutes = now.getMinutes();
-
-                visitTimeSelect.innerHTML = "";
-
-                for (let hour = 0; hour < 24; hour++) {
-                    for (let minutes = 0; minutes < 60; minutes += 30) {
-                        const hourString = hour.toString().padStart(2, '0');
-                        const minuteString = minutes.toString().padStart(2, '0');
-                        const timeString = `${hourString}:${minuteString}`;
-
-                        const option = document.createElement("option");
-                        option.value = timeString;
-                        option.text = timeString;
-
-                        if (hour > currentHour || (hour === currentHour && minutes >= Math.ceil(currentMinutes / 30) * 30)) {
-                            visitTimeSelect.add(option);
-                        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeId = urlParams.get("store_id");
+        const storeName = urlParams.get("store_name");
+        const storeType = urlParams.get("store_type");
+        const storeLat = parseFloat(urlParams.get("latitude"));
+        const storeLng = parseFloat(urlParams.get("longitude"));
+        const userId = window.name || "유저";
+    
+        const storeTypeMap = {
+            'a': '한식', 'b': '중식', 'c': '일식', 'd': '양식',
+            'e': '패스트푸드', 'f': '일반대중음식', 'g': '편의점', 'h': '제과점'
+        };
+    
+        document.getElementById("store_id").value = storeId;
+        document.getElementById("store_name").value = storeName;
+        document.getElementById("store_type").value = storeType;
+    
+        const storeTypeText = storeTypeMap[storeType] || '알 수 없음';
+        const storeInfoDiv = document.getElementById("store-info");
+        storeInfoDiv.innerHTML = `
+            <p><strong>가게 이름:</strong> ${storeName}</p>
+            <p><strong>가게 종류:</strong> ${storeTypeText}</p>
+        `;
+    
+        const userInfoDiv = document.getElementById("user-info");
+        userInfoDiv.innerHTML = `<p><strong>${userId}</strong>님, 예약을 진행해 주세요.</p>`;
+    
+        function updateTimeOptions() {
+            const visitTimeSelect = document.getElementById("visit_time");
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinutes = now.getMinutes();
+    
+            visitTimeSelect.innerHTML = "";
+    
+            for (let hour = 0; hour < 24; hour++) {
+                for (let minutes = 0; minutes < 60; minutes += 30) {
+                    const hourString = hour.toString().padStart(2, '0');
+                    const minuteString = minutes.toString().padStart(2, '0');
+                    const timeString = `${hourString}:${minuteString}`;
+    
+                    const option = document.createElement("option");
+                    option.value = timeString;
+                    option.text = timeString;
+    
+                    if (hour > currentHour || (hour === currentHour && minutes >= Math.ceil(currentMinutes / 30) * 30)) {
+                        visitTimeSelect.add(option);
                     }
                 }
             }
-
-            updateTimeOptions();
-
-            document.getElementById("reservationForm").addEventListener("submit", async function (event) {
-                event.preventDefault();
-
-                const formData = new FormData(this);
-                const reservationDate = formData.get("visit_date");
-                const reservationTime = formData.get("visit_time");
-                const reservationDatetime = `${reservationDate}T${reservationTime}:00`;
-
-                try {
-                    const response = await fetch(`http://localhost:8002/users/users/${getUserIdFromSession()}/reservation`, {
-                        method: "POST",
-                        body: JSON.stringify({
-                            store_name: formData.get("store_name"),
-                            reservation_datetime: reservationDatetime
-                        }),
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error("예약 요청 실패");
+        }
+    
+        updateTimeOptions();
+    
+        document.getElementById("reservationForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+    
+            const formData = new FormData(this);
+            const reservationDate = formData.get("visit_date");
+            const reservationTime = formData.get("visit_time");
+            const reservationDatetime = `${reservationDate}T${reservationTime}:00`;
+    
+            if (!userId) {
+                alert("로그인이 필요합니다.");
+                return;
+            }
+    
+            try {
+                const response = await fetch(`http://localhost:8002/users/${userId}/reservation`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        user_idx: userId,
+                        store_idx: storeId,
+                        reservation_datetime: reservationDatetime
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
                     }
-
-                    alert("예약이 성공적으로 완료되었습니다!");
-                    window.location.href = "reservation.html";
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("예약 중 오류가 발생했습니다. 다시 시도해 주세요.");
+                });
+    
+                if (!response.ok) {
+                    throw new Error("예약 요청 실패");
+                }
+    
+                alert("예약이 성공적으로 완료되었습니다!");
+                window.location.href = "reservation.html";
+            } catch (error) {
+                console.error("Error:", error);
+                alert("예약 중 오류가 발생했습니다. 다시 시도해 주세요.");
+            }
+        });
+    
+        function initMap() {
+            const storeLocation = new kakao.maps.LatLng(storeLat, storeLng);
+            const map = new kakao.maps.Map(document.getElementById('map'), {
+                center: storeLocation,
+                level: 6
+            });
+    
+            const storeMarker = new kakao.maps.Marker({
+                map: map,
+                position: storeLocation,
+                title: storeName
+            });
+    
+            const userLocationMarker = new kakao.maps.Marker({
+                map: map,
+                position: storeLocation,
+                title: '현재 위치',
+                icon: {
+                    content: '<div style="color:blue;">현재 위치</div>'
                 }
             });
-
-            function getUserIdFromSession() {
-                // 세션에서 현재 로그인된 사용자의 ID를 반환하는 함수
-                return window.name;
-            }
-
-            function initMap() {
-                const storeLocation = new kakao.maps.LatLng(storeLat, storeLng);
-                const map = new kakao.maps.Map(document.getElementById('map'), {
-                    center: storeLocation, // 초기 중심 좌표를 가게 위치로 설정
-                    level: 6 // 줌 레벨 조정
-                });
-
-                // 목표 위치 마커
-                const storeMarker = new kakao.maps.Marker({
-                    map: map,
-                    position: storeLocation,
-                    title: storeName
-                });
-
-                // 현재 위치 마커
-                const userLocationMarker = new kakao.maps.Marker({
-                    map: map,
-                    position: storeLocation, // 초기 위치는 가게 위치와 동일
-                    title: '현재 위치',
-                    icon: {
-                        content: '<div style="color:blue;">현재 위치</div>'
-                    }
-                });
-
-                function getCurrentLocation() {
-                    if (navigator.geolocation) {
-                        navigator.geolocation.watchPosition(function(position) {
-                            const lat = position.coords.latitude;
-                            const lng = position.coords.longitude;
-                            const currentLatLng = new kakao.maps.LatLng(lat, lng);
-
-                            // 현재 위치 마커 업데이트
-                            userLocationMarker.setPosition(currentLatLng);
-                        }, function() {
-                            alert("현재 위치를 가져올 수 없습니다.");
-                        });
-                    } else {
-                        alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
-                    }
+    
+            function getCurrentLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.watchPosition(function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        const currentLatLng = new kakao.maps.LatLng(lat, lng);
+    
+                        userLocationMarker.setPosition(currentLatLng);
+                    }, function() {
+                        alert("현재 위치를 가져올 수 없습니다.");
+                    });
+                } else {
+                    alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
                 }
-
-                // 지도 로딩 시 현재 위치 가져오기
-                getCurrentLocation();
             }
-
-            initMap();
-        });
+    
+            getCurrentLocation();
+        }
+    
+        initMap();
+    });
     </script>
     </body>
 </html>
