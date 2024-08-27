@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GFOOD Reservations</title>
@@ -40,31 +40,35 @@
         width: 100%;
         overflow-y: auto;
         padding: 20px;
+        box-sizing: border-box;
       }
 
       .reservation-box {
-        width: 80%;
+        width: 100%;
+        max-width: 450px;
         border-radius: 10px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         padding: 15px;
         margin-bottom: 15px;
         background-color: #ffffff;
         position: relative;
-        transition: transform 0.3s;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .reservation-box .datetime {
-        font-size: 1rem;
-        color: #333;
-        margin-bottom: 5px;
+        flex-direction: column;
+        align-items: flex-start;
+        box-sizing: border-box;
       }
 
       .reservation-box .store {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .reservation-box .reservation-id,
+      .reservation-box .datetime {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 5px;
       }
 
       .past-reservation {
@@ -78,6 +82,9 @@
       }
 
       .cancel-button {
+        position: absolute;
+        right: 15px;
+        bottom: 15px;
         background-color: #f44336;
         color: #fff;
         border: none;
@@ -136,8 +143,8 @@
         text-decoration: underline;
       }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
       <header id="site-header">
         <div id="logo">GFOOD</div>
@@ -171,82 +178,69 @@
       </footer>
     </div>
     <script>
-      const userId = getUserIdFromSession();
-      fetchReservations(userId);
-    
-      function getUserIdFromSession() {
-        // 로그인 후 사용자 id 가져오기 필요
-        return window.name; // 예시로 세션에서 userId를 가져오는 부분
-      }
-    
       function fetchReservations(userId) {
-        fetch(`http://localhost:8002/users/${userId}/reservation`)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok");
-            }
-            return response.json();
-          })
-          .then((data) => {
-            const reservationSection = document.getElementById("reservationSection");
-            const now = new Date();
-    
-            // 예약을 시간순으로 내림차순 정렬
-            data.sort((a, b) => new Date(b.reservation_at) - new Date(a.reservation_at));
-    
-            // Clear previous reservations
-            reservationSection.innerHTML = '';
-    
-            data.forEach((reservation) => {
-              const reservationBox = document.createElement("div");
-              reservationBox.className = "reservation-box";
-    
-              const reservationDate = new Date(reservation.reservation_at);
-    
-              // 예약 시간을 표시
-              const dateTimeSpan = document.createElement("span");
-              dateTimeSpan.className = "datetime";
-              dateTimeSpan.textContent = reservationDate.toLocaleString();
-    
-              // 예약이 과거인지 미래인지에 따라 스타일 적용
-              if (reservationDate < now) {
-                reservationBox.classList.add("past-reservation");
-              } else {
-                reservationBox.classList.add("upcoming-reservation");
-              }
-    
-              // 상점 이름을 표시
-              const storeSpan = document.createElement("span");
-              storeSpan.className = "store";
-              storeSpan.textContent = reservation.store_name;
-    
-              // 예약 취소 버튼 추가
-              const cancelButton = document.createElement("button");
-              cancelButton.className = "cancel-button";
-              cancelButton.textContent = "예약 취소";
-              cancelButton.onclick = function () {
-                cancelReservation(userId, reservation.reservation_id, reservationBox);
-              };
-    
-              reservationBox.appendChild(storeSpan);
-              reservationBox.appendChild(dateTimeSpan);
-              reservationBox.appendChild(cancelButton);
-              reservationSection.appendChild(reservationBox);
-            });
-          })
-          .catch((error) => {
-            console.error("There was a problem with the fetch operation:", error);
-          });
+  fetch(`http://localhost:8002/users/${userId}/reservation`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
-    
+      return response.json();
+    })
+    .then((data) => {
+      const reservationSection = document.getElementById("reservationSection");
+
+      // Clear previous reservations
+      reservationSection.innerHTML = '';
+
+      data.forEach((reservation) => {
+        const reservationBox = document.createElement("div");
+        reservationBox.className = "reservation-box upcoming-reservation"; // 모든 예약 항목을 초록색으로 설정
+
+        const reservationDate = new Date(reservation.reservationAt);
+
+        // 예약 시간을 표시
+        const dateTimeSpan = document.createElement("span");
+        dateTimeSpan.className = "datetime";
+        dateTimeSpan.textContent = reservationDate.toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+        // 상점 이름을 표시
+        const storeSpan = document.createElement("span");
+        storeSpan.className = "store";
+        storeSpan.textContent = reservation.store_name;
+
+        // 예약 ID를 표시
+        const reservationIdSpan = document.createElement("span");
+        reservationIdSpan.className = "reservation-id";
+        reservationIdSpan.textContent = `예약 ID: ${reservation.reservationId}`;
+
+        // 예약 취소 버튼 추가
+        const cancelButton = document.createElement("button");
+        cancelButton.className = "cancel-button";
+        cancelButton.textContent = "예약 취소";
+        cancelButton.onclick = function () {
+          cancelReservation(userId, reservation.reservationId, reservationBox); // 예약 ID 전달
+        };
+
+        reservationBox.appendChild(storeSpan);
+        reservationBox.appendChild(dateTimeSpan);
+        reservationBox.appendChild(reservationIdSpan); // 예약 ID 추가
+        reservationBox.appendChild(cancelButton);
+        reservationSection.appendChild(reservationBox);
+      });
+    })
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
+}
+
+
       function cancelReservation(userId, reservationId, reservationBox) {
         if (confirm("정말로 이 예약을 취소하시겠습니까?")) {
-          fetch(`http://localhost:8002/users/${userId}/reservation`, {
+          fetch(`http://localhost:8002/users/${userId}/reservation/${reservationId}`, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ reservation_id: reservationId }), // 삭제할 예약 ID 전송
+            }
           })
           .then((response) => {
             if (!response.ok) {
@@ -262,6 +256,17 @@
           });
         }
       }
+
+      function getUserIdFromSession() {
+        return window.name; // 세션에서 사용자 ID 가져오기
+      }
+      const userId = getUserIdFromSession();
+      if (userId) {
+        fetchReservations(userId);
+      } else {
+        alert("사용자 ID를 찾을 수 없습니다.");
+      }
     </script>
-    </body>
+</body>
 </html>
+
